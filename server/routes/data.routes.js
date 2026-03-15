@@ -65,25 +65,41 @@ router.get('/stats', protect, catchAsync(async (req, res) => {
     score: Math.round(d.score)
   }));
 
-  // Top Mood
+  // Top Mood & Color Mapping
   const moodCounts = stats.moodTags.reduce((acc, mood) => {
     acc[mood] = (acc[mood] || 0) + 1;
     return acc;
   }, {});
   const topMood = Object.keys(moodCounts).sort((a,b) => moodCounts[b] - moodCounts[a])[0] || 'Unknown';
 
+  // Calculate Resonance (how stable the mood is)
+  const resonance = stats.totalCommits > 0 ? Math.round((moodCounts[topMood] / stats.totalCommits) * 100) : 0;
+
+  const repoCount = await Repo.countDocuments({ userId });
+  const repoList = await Repo.find({ userId }).sort({ name: 1 });
+  const recentCommits = await Commit.find({ userId })
+    .sort({ timestamp: -1 })
+    .limit(5)
+    .populate('repoId', 'name');
+
   res.status(200).json({
     success: true,
     data: {
-      commitCount: stats.totalCommits || 0,
-      avgSentiment: Math.round(stats.avgSentiment) || 0,
-      avgBurnout: Math.round(stats.avgBurnout) || 0,
-      topMood,
+      metrics: {
+        totalCommits: stats.totalCommits || 0,
+        repoCount: repoCount || 0,
+        emotionalResonance: `${resonance}%`,
+        avgSentiment: Math.round(stats.avgSentiment) || 0,
+        avgBurnout: Math.round(stats.avgBurnout) || 0,
+        topMood,
+      },
+      repoList: repoList || [],
+      recentCommits,
       chartData: formattedChart.length ? formattedChart : [
         { name: 'M', score: 50 }, { name: 'T', score: 50 }, { name: 'W', score: 50 }
       ],
       syncStatus: req.user.syncStatus,
-      lastSyncedAt: req.user.lastSyncedAt
+      lastSyncedAt: req.user.lastSyncedAt || new Date()
     },
   });
 }));

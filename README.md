@@ -1,70 +1,87 @@
-# DevPulse — Operational Developer Analytics
+# ⚡ PULSE.IO — DEVELOPER WELLNESS ANALYTICS
 
-![DevPulse Brutalist Banner](https://via.placeholder.com/1200x400/000000/FF6B00?text=DEVPULSE+_+INTENSITY+ENGINEERING)
+### [ ANALYZE // EVOLVE // SURVIVE ]
 
-> **"Code Brutalist. Live Well."**
-
-DevPulse is a high-intensity, AI-powered wellness and productivity platform for engineers. It integrates directly with your GitHub ecosystem to monitor burnout risks, emotional sentiment, and flow-state harmonics using Groq LLM analysis.
-
-## ⚡ CORE CAPABILITIES
-
-- **Vibe Sensing**: Real-time LLM analysis of commit narratives to detect developer fatigue.
-- **Burnout Mitigation**: Hard-hitting metrics identifying late-night patterns and high-friction repos.
-- **Operational Dashboard**: A brutalist terminal for tracking your cognitive pulse.
-- **Wrapped Summaries**: Weekly and Monthly "DevWrapped" style health & productivity briefings.
-
-## 🛠 TECH STACK
-
-- **Frontend**: React 18, Vite, Tailwind CSS (Brutalist System), Lucide Icons, Recharts.
-- **Backend**: Node.js, Express, Passport.js (GitHub OAuth).
-- **Database**: MongoDB + Mongoose.
-- **AI Engine**: Groq SDK (Llama 3.3 70B Versatile).
-- **Communication**: Octokit (GitHub REST API).
-
-## 🚀 GETTING STARTED
-
-### Prerequisites
-- Node.js v18+
-- MongoDB Atlas (Free Tier)
-- GitHub OAuth App Credentials
-- Groq API Key (Free Tier)
-
-### Environment Setup
-Create a `.env` in the `server` directory:
-```env
-PORT=5000
-MONGO_URI=your_mongodb_uri
-JWT_SECRET=your_jwt_secret
-GITHUB_CLIENT_ID=your_id
-GITHUB_CLIENT_SECRET=your_secret
-GITHUB_CALLBACK_URL=http://localhost:5000/api/v1/auth/github/callback
-CLIENT_URL=http://localhost:5173
-GROQ_API_KEY=your_groq_key
-```
-
-### Installation
-1. Clone the repository.
-2. Install dependencies:
-   ```bash
-   # Server
-   cd server && npm install
-   # Client
-   cd ../client && npm install
-   ```
-3. Run Development:
-   ```bash
-   # Terminal 1 (Server)
-   cd server && npm run dev
-   # Terminal 2 (Client)
-   cd client && npm run dev
-   ```
-
-## 📐 DESIGN PHILOSOPHY
-DevPulse follows a **Brutalist Design System**:
-- High-contrast (Orange, Yellow, Black).
-- Thick 8px borders.
-- Hard-edged shadows (no blurs).
-- Industrial typography (Outfit Black).
+**Pulse.IO** is a high-density developer analytics platform that turns your GitHub commit history into an operational health report. Powered by **Groq AI (Llama 3.3)**, it provides raw sentiment tracking, burnout detection, and "Spotify-Wrapped" style weekly summaries for the modern engineer.
 
 ---
-© 2026 DEVPULSE PLATFORM. NO TRACKERS. NO FLUFF.
+
+## 🛠️ THE_CORE_STACK
+- **CORE**: Node.js 25 // React 18 // Vite 6
+- **VISUALS**: Tailwind CSS // Brutalist UI System // Recharts
+- **INTELLIGENCE**: Groq Cloud (Llama 3.3) // Anthropic Claude (Fallback)
+- **DATABASE**: MongoDB Atlas (Cloud)
+- **SECURITY**: JWT // Passport.js (GitHub OAuth)
+
+---
+
+## 🚀 KEY_FEATURES
+- 🧠 **AI_Command_Insights**: Real-time briefing for every commit message using LLMs.
+- 🔥 **Burnout_Radar**: Operational risk assessment based on after-hours activity and sentiment drift.
+- 🎨 **Dev_Wrapped**: Generative poster-style snapshots of your weekly developer vibe.
+- ⚡ **Flow_Sentiment**: Threshold-based color coding (Green/Red) to detect flow state versus system friction.
+- 📡 **Live_Operational_Feed**: High-density dashboard showing real-time operational signals.
+
+---
+
+## 🕹️ LOCAL_INITIALIZATION
+
+### 1. CLONE_AND_INSTALL
+```bash
+git clone https://github.com/Asad101001/devpulse.git
+cd devpulse
+# Install Server
+cd server && npm install
+# Install Client
+cd ../client && npm install
+```
+
+### 2. CONFIGURATION (.env)
+Create a `.env` in the `server/` directory:
+```bash
+PORT=5000
+MONGO_URI=your_mongodb_atlas_uri
+SESSION_SECRET=your_random_secret
+JWT_SECRET=your_jwt_secret
+GITHUB_CLIENT_ID=your_github_client_id
+GITHUB_CLIENT_SECRET=your_github_client_secret
+GITHUB_CALLBACK_URL=http://localhost:5000/api/v1/auth/github/callback
+GROQ_API_KEY=your_groq_api_key
+CLIENT_URL=http://localhost:5173
+```
+
+### 3. RUN_OPERATIONS
+```bash
+# Terminal 1: Backend
+cd server && npm run dev
+# Terminal 2: Frontend
+cd client && npm run dev
+```
+
+---
+
+## ⚙️ DEPLOYMENT_PROCESS
+
+Pulse.IO is designed for the **Free Tier Ecosystem** ($0 cost deployment).
+
+### PHASE_A: BACKEND (Render.com)
+1. **Repository**: Connect your GitHub repo to Render.
+2. **Build Selection**: Root: `server` // Build: `npm install` // Start: `node index.js`.
+3. **Environment**: Add all variables from your `.env` (Use Production URLs).
+4. **Health Check**: Ensure `api/v1/health` returns `status: ok`.
+
+### PHASE_B: FRONTEND (Vercel)
+1. **Repository**: Import the project as a Vercel project.
+2. **Configuration**: Root: `client` // Framework: Vite // Build Command: `npm run build`.
+3. **Production ENV**: `VITE_API_URL` should point to your Render app URL.
+4. **Routing**: Handled by the included `vercel.json` rewrite rules.
+
+---
+
+## 📜 RECENT_OPERATIONS
+Check the [WORK_LOG.md](WORK_LOG.md) for detailed implementation history and the [docs/](docs/) directory for full technical specifications.
+
+---
+
+### [ SYSTEM_STATUS: OPERATIONAL ]
+Developed by **Asad101001** for the Google Deepmind Advanced Agentic Coding Challenge.

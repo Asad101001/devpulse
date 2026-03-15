@@ -33,6 +33,8 @@ passport.use(new GitHubStrategy({
       // Find or create user
       let user = await User.findOne({ githubId: profile.id });
 
+      console.log(`[Passport] Received token for ${profile.username}, length: ${accessToken?.length}`);
+
       const userData = {
         githubId: profile.id,
         username: profile.username,

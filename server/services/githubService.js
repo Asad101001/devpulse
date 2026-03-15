@@ -10,21 +10,36 @@ import { analyzeCommitSentiment, sleep } from './aiService.js';
  * @returns {Octokit}
  */
 export const getOctokit = (token) => {
-  return new Octokit({ auth: token });
+  if (!token) {
+    console.error('[Octokit] Cannot initialize: Token is missing');
+    return null;
+  }
+  console.log('[Octokit] Initializing with token (length:', token.length, ')');
+  return new Octokit({ auth: token.trim() });
 };
 
-/**
- * Sync all repositories for a user
- * @param {Object} user - User document
- */
 export const syncUserRepos = async (user) => {
   const octokit = getOctokit(user.githubAccessToken);
+  if (!octokit) throw new Error('Octokit initialization failed: Missing token');
+
+  console.log('[Sync] Verifying token viability...');
+  try {
+    const { data: ghUser } = await octokit.rest.users.getAuthenticated();
+    console.log(`[Sync] Token verified for GH User: ${ghUser.login}`);
+  } catch (err) {
+    console.error('[Sync] Token verification FAILED:', err.message);
+    throw new Error(`GitHub Authentication failed: ${err.message}`);
+  }
+  
+  console.log('[Sync] Fetching repositories for user...');
   
   // List all repositories where user is an owner or collaborator
   const { data: repos } = await octokit.rest.repos.listForAuthenticatedUser({
     visibility: 'all',
     per_page: 100,
   });
+
+  console.log(`[Sync] Found ${repos.length} repositories.`);
 
   const syncedRepos = [];
 
@@ -115,8 +130,15 @@ export const syncRepoCommits = async (user, repo) => {
  * Sync everything for a user (repos + commits)
  * @param {Object} user - User document
  */
-export const syncAllForUser = async (user) => {
+export const syncAllForUser = async (userInput) => {
   try {
+    const user = await User.findById(userInput._id);
+    if (!user || !user.githubAccessToken) {
+        throw new Error('User not found or GitHub token missing');
+    }
+
+    console.log(`[Sync] Starting sync for user: ${user.username}`);
+
     // 1. Update user sync status
     await User.findByIdAndUpdate(user._id, { syncStatus: 'syncing' });
 

@@ -5,11 +5,11 @@
 ### Initial Setup
 - [x] Explored `.claude` folder for project requirements and architecture.
 - [x] Read `PROJECT_CONTEXT.md`, `ARCHITECTURE.md`, `SKILLS.md`, `FREE_TIER_SETUP.md`, and `TROUBLESHOOTING.md`.
-- [x] Initialize root directory structure.
-- [x] Setup Backend (server) boilerplate.
-- [x] Setup Frontend (client) boilerplate.
-
-### Phase 1 - Foundation
+- **Dashboard Hyper-Evolution**: Redesigned the dashboard to move away from vague placeholders toward high-density "Operational Signals".
+- **AI Transparency Engine**: Added the 'AI_Command_Insights' feed, exposing the raw Groq-generated briefings for every commit.
+- **Threshold Color Coding**: Implemented a global color-coding system (Green for Flow, Red for Burnout) to make data intuitive at a glance.
+- **Dev_Wrapped Snapshot**: Created a generative poster modal for weekly summaries, following the requested "Spotify Wrapped" style.
+- **Project Structure Fix**: Initialized the `docs/` directory and transitioned from `.claude` as requested.
 - [x] GitHub OAuth login/logout via Passport.js
 - [x] Fetch repos + last 90 days of commits via Octokit
 - [x] Store everything in MongoDB (User, Repo, Commit models)
