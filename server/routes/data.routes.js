@@ -82,6 +82,17 @@ router.get('/stats', protect, catchAsync(async (req, res) => {
     .limit(5)
     .populate('repoId', 'name');
 
+  const heatmapData = await Commit.aggregate([
+    { $match: { userId, timestamp: { $gte: new Date(Date.now() - 90 * 24 * 60 * 60 * 1000) } } },
+    {
+      $group: {
+        _id: { $dateToString: { format: "%Y-%m-%d", date: "$timestamp" } },
+        count: { $sum: 1 }
+      }
+    },
+    { $sort: { "_id": 1 } }
+  ]);
+
   res.status(200).json({
     success: true,
     data: {
@@ -95,6 +106,7 @@ router.get('/stats', protect, catchAsync(async (req, res) => {
       },
       repoList: repoList || [],
       recentCommits,
+      heatmapData: heatmapData || [],
       chartData: formattedChart.length ? formattedChart : [
         { name: 'M', score: 50 }, { name: 'T', score: 50 }, { name: 'W', score: 50 }
       ],

@@ -15,8 +15,8 @@ const Landing = () => {
       {/* Marquee */}
       <div className="bg-black text-white py-4 border-b-[8px] border-black whitespace-nowrap overflow-hidden">
         <div className="inline-block animate-marquee font-black uppercase italic text-2xl">
-          SYSTEM_ANALYTICS // BURNOUT_DETECTION // REAL_TIME_SENTIMENT // GROQ_POWERED // NO_TRACKERS // END_TO_END_ENCRYPTION // 
-          SYSTEM_ANALYTICS // BURNOUT_DETECTION // REAL_TIME_SENTIMENT // GROQ_POWERED // NO_TRACKERS // END_TO_END_ENCRYPTION // 
+          SYSTEM ANALYTICS // BURNOUT DETECTION // REAL TIME SENTIMENT // GROQ POWERED // NO TRACKERS // END TO END ENCRYPTION // 
+          SYSTEM ANALYTICS // BURNOUT DETECTION // REAL TIME SENTIMENT // GROQ POWERED // NO TRACKERS // END TO END ENCRYPTION // 
         </div>
       </div>
 
@@ -106,30 +106,30 @@ const Landing = () => {
 
       {/* Operational Flow */}
       <section className="bg-[#FF6B00] border-y-[8px] border-black p-8 lg:p-16 flex flex-col gap-20">
-         <h2 className="text-5xl md:text-7xl font-black uppercase italic tracking-tighter text-white leading-none">The_Operational <br /> <span className="text-black">Pipeline.</span></h2>
+         <h2 className="text-5xl md:text-7xl font-black uppercase italic tracking-tighter text-white leading-none">The Operational <br /> <span className="text-black">Pipeline.</span></h2>
          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <FlowStep num="01" label="Connect_GH" desc="Authorize securely via OAuth." />
-            <FlowStep num="02" label="Injest_Data" desc="We sync your last 90 days of work." />
-            <FlowStep num="03" label="AI_Inference" desc="Groq Llama 3 processes your vibe." />
-            <FlowStep num="04" label="Kill_Burnout" desc="Actionable wellness directives." />
+            <FlowStep num="01" label="Connect GH" desc="Authorize securely via OAuth." />
+            <FlowStep num="02" label="Ingest Data" desc="We sync your last 90 days of work." />
+            <FlowStep num="03" label="AI Inference" desc="Groq Llama 3 processes your vibe." />
+            <FlowStep num="04" label="Kill Burnout" desc="Actionable wellness directives." />
          </div>
       </section>
 
       {/* Security Block */}
       <section className="bg-white p-8 lg:p-16 border-b-[8px] border-black grid grid-cols-1 lg:grid-cols-2 gap-20">
          <div className="space-y-10">
-            <h2 className="text-5xl font-black uppercase italic tracking-tighter leading-none">Hardened_Security. <br /> Zero_Proxies.</h2>
+            <h2 className="text-5xl font-black uppercase italic tracking-tighter leading-none">Hardened Security. <br /> Zero Proxies.</h2>
             <p className="text-xl font-bold leading-relaxed max-w-xl">
                DevPulse operates with direct-to-metal processing. We don't sell data. We don't track users. We solve the burnout problem using raw engineering principles.
             </p>
             <div className="flex gap-4">
-               <div className="p-4 bg-black text-white font-black uppercase">AES_256</div>
-               <div className="p-4 bg-black text-white font-black uppercase">TLS_1.3</div>
-               <div className="p-4 bg-black text-white font-black uppercase">JWT_AUTH</div>
+               <div className="p-4 bg-black text-white font-black uppercase">AES 256</div>
+               <div className="p-4 bg-black text-white font-black uppercase">TLS 1.3</div>
+               <div className="p-4 bg-black text-white font-black uppercase">JWT AUTH</div>
             </div>
          </div>
          <div className="bg-black text-[#FFD600] p-12 border-[8px] border-black shadow-[20px_20px_0px_0px_#FF6B00] flex flex-col justify-between">
-            <div className="text-xs font-black uppercase tracking-widest opacity-50">ENCRYPTED_SIGNAL_STREAM</div>
+            <div className="text-xs font-black uppercase tracking-widest opacity-50">ENCRYPTED SIGNAL STREAM</div>
             <div className="space-y-4">
                <div className="h-2 bg-[#FFD600] w-full"></div>
                <div className="h-2 bg-[#FFD600] w-[80%]"></div>
@@ -147,14 +147,14 @@ const Landing = () => {
             onClick={onLogin}
             className="bg-black text-white px-16 py-8 text-4xl font-black uppercase italic border-[6px] border-black shadow-[15px_15px_0px_0px_#FF6B00] hover:shadow-none hover:translate-x-3 hover:translate-y-3 transition-all"
          >
-            INITIATE_SYNC_NOW
+            INITIATE SYNC NOW
          </button>
       </section>
 
       {/* Final Marquee */}
       <div className="bg-black text-[#FFD600] py-6 whitespace-nowrap overflow-hidden border-b-[8px] border-black">
         <div className="inline-block animate-marquee font-black uppercase italic text-4xl">
-          CODE_BRUTALIST // LIVE_WELL // DEVPULSE_OS // NO_BULLSHIT // CODE_BRUTALIST // LIVE_WELL // DEVPULSE_OS // NO_BULLSHIT // 
+          CODE BRUTALIST // LIVE WELL // DEVPULSE OS // NO BULLSHIT // CODE BRUTALIST // LIVE WELL // DEVPULSE OS // NO BULLSHIT // 
         </div>
       </div>
 
