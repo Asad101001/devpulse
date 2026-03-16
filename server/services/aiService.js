@@ -9,13 +9,14 @@ const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
  */
 export async function analyzeCommitSentiment(commitMessage) {
   const systemPrompt = `
-    You are the DevPulse Brutalist Sentiment Engine. 
-    Analyze the following commit message and provide a JSON response.
+    You are the Pulse IO Advanced Sentiment Engine.
+    Analyze the following commit message and provide a professional yet industrial JSON response.
     Fields:
-    - score: (0-100) where 100 is extremely positive/productive and 0 is extremely frustrated/angry.
-    - burnout: (0-100) likelihood of burnout based on tone.
-    - vibe: (string) one word category (e.g., productive, tired, furious, efficient, chaotic).
-    - briefing: (string) 10-word max intense brutalist summary.
+    - score: (0-100) where 100 is extremely positive/productive and 0 is extremely frustrated.
+    - burnout: (0-100) likelihood of burnout based on tone and complexity.
+    - vibe: (string) one word category (e.g., Focused, Exhausted, Agile, Efficient, Chaotic).
+    - briefing: (string) 5-word max concise summary.
+    - recommendation: (string) 15-word max actionable engineering advice.
     Return ONLY JSON.
   `;
 

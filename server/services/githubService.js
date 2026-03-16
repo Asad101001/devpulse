@@ -109,6 +109,7 @@ export const syncRepoCommits = async (user, repo) => {
         burnoutIndex: aiAnalysis.burnout,
         moodTag: aiAnalysis.vibe,
         aiSummary: aiAnalysis.briefing,
+        aiRecommendation: aiAnalysis.recommendation,
       },
       { upsert: true, new: true }
     );
@@ -158,8 +159,11 @@ export const syncAllForUser = async (userInput) => {
 
     return { success: true };
   } catch (err) {
-    console.error(`[Sync] Error syncing user ${user.username}:`, err.message);
-    await User.findByIdAndUpdate(user._id, { syncStatus: 'error' });
+    const userId = userInput?._id || 'unknown';
+    console.error(`[Sync] Error syncing user ${userId}:`, err.message);
+    if (userInput?._id) {
+      await User.findByIdAndUpdate(userInput._id, { syncStatus: 'error' });
+    }
     throw err;
   }
 };

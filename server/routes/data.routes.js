@@ -32,6 +32,7 @@ router.post('/sync', protect, catchAsync(async (req, res) => {
 router.get('/stats', protect, catchAsync(async (req, res) => {
   const userId = req.user._id;
   
+  // Basic Aggregation
   const statsAggregate = await Commit.aggregate([
     { $match: { userId } },
     { 
@@ -47,7 +48,7 @@ router.get('/stats', protect, catchAsync(async (req, res) => {
 
   const stats = statsAggregate[0] || { avgSentiment: 50, avgBurnout: 0, totalCommits: 0, moodTags: [] };
 
-  // Get chart data (last 7 days)
+  // 1. Chart Data (Last 7 Days)
   const chartData = await Commit.aggregate([
     { $match: { userId } },
     {
@@ -65,25 +66,12 @@ router.get('/stats', protect, catchAsync(async (req, res) => {
     score: Math.round(d.score)
   }));
 
-  // Top Mood & Color Mapping
-  const moodCounts = stats.moodTags.reduce((acc, mood) => {
-    acc[mood] = (acc[mood] || 0) + 1;
-    return acc;
-  }, {});
-  const topMood = Object.keys(moodCounts).sort((a,b) => moodCounts[b] - moodCounts[a])[0] || 'Unknown';
-
-  // Calculate Resonance (how stable the mood is)
-  const resonance = stats.totalCommits > 0 ? Math.round((moodCounts[topMood] / stats.totalCommits) * 100) : 0;
-
-  const repoCount = await Repo.countDocuments({ userId });
-  const repoList = await Repo.find({ userId }).sort({ name: 1 });
-  const recentCommits = await Commit.find({ userId })
-    .sort({ timestamp: -1 })
-    .limit(5)
-    .populate('repoId', 'name');
-
+  // 2. Heatmap Data (Last 90 Days)
+  const ninetyDaysAgo = new Date();
+  ninetyDaysAgo.setDate(ninetyDaysAgo.getDate() - 90);
+  
   const heatmapData = await Commit.aggregate([
-    { $match: { userId, timestamp: { $gte: new Date(Date.now() - 90 * 24 * 60 * 60 * 1000) } } },
+    { $match: { userId, timestamp: { $gte: ninetyDaysAgo } } },
     {
       $group: {
         _id: { $dateToString: { format: "%Y-%m-%d", date: "$timestamp" } },
@@ -92,6 +80,45 @@ router.get('/stats', protect, catchAsync(async (req, res) => {
     },
     { $sort: { "_id": 1 } }
   ]);
+
+  // 3. Top Moods & Resonance
+  const moodCounts = stats.moodTags.reduce((acc, mood) => {
+    acc[mood] = (acc[mood] || 0) + 1;
+    return acc;
+  }, {});
+  const topMood = Object.keys(moodCounts).sort((a,b) => moodCounts[b] - moodCounts[a])[0] || 'Unknown';
+  const resonance = stats.totalCommits > 0 ? Math.round((moodCounts[topMood] / stats.totalCommits) * 100) : 0;
+
+  // 4. Wrapped Extracted Stats
+  const starRepo = await Commit.aggregate([
+    { $match: { userId } },
+    { $group: { _id: "$repoId", count: { $sum: 1 } } },
+    { $sort: { count: -1 } },
+    { $limit: 1 },
+    { $lookup: { from: 'repos', localField: '_id', foreignField: '_id', as: 'repo' } },
+    { $unwind: { path: '$repo', preserveNullAndEmptyArrays: true } }
+  ]);
+
+  const peakDayAgg = await Commit.aggregate([
+    { $match: { userId } },
+    { $group: { _id: { $dayOfWeek: "$timestamp" }, count: { $sum: 1 } } },
+    { $sort: { count: -1 } },
+    { $limit: 1 }
+  ]);
+
+  const lateNight = await Commit.countDocuments({
+    userId,
+    $expr: { $gte: [{ $hour: "$timestamp" }, 22] } // 10 PM onwards
+  });
+
+  const fullDays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+  
+  const repoCount = await Repo.countDocuments({ userId });
+  const repoList = await Repo.find({ userId }).sort({ name: 1 });
+  const recentCommits = await Commit.find({ userId })
+    .sort({ timestamp: -1 })
+    .limit(5)
+    .populate('repoId', 'name');
 
   res.status(200).json({
     success: true,
@@ -103,10 +130,13 @@ router.get('/stats', protect, catchAsync(async (req, res) => {
         avgSentiment: Math.round(stats.avgSentiment) || 0,
         avgBurnout: Math.round(stats.avgBurnout) || 0,
         topMood,
+        starRepo: starRepo[0]?.repo?.name || 'Silent_System',
+        peakDay: peakDayAgg[0] ? fullDays[peakDayAgg[0]._id - 1] : 'N/A',
+        lateNightCommits: lateNight
       },
       repoList: repoList || [],
       recentCommits,
-      heatmapData: heatmapData || [],
+      heatmapData,
       chartData: formattedChart.length ? formattedChart : [
         { name: 'M', score: 50 }, { name: 'T', score: 50 }, { name: 'W', score: 50 }
       ],

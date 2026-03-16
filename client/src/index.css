@@ -25,15 +25,15 @@ body {
   }
   
   .brutal-shadow {
-    box-shadow: 8px 8px 0px 0px var(--brutal-black);
+    box-shadow: 6px 6px 0px 0px var(--brutal-black);
   }
 
   .brutal-shadow-orange {
-    box-shadow: 8px 8px 0px 0px var(--brutal-orange);
+    box-shadow: 6px 6px 0px 0px var(--brutal-orange);
   }
 
   .brutal-shadow-yellow {
-    box-shadow: 8px 8px 0px 0px var(--brutal-yellow);
+    box-shadow: 6px 6px 0px 0px var(--brutal-yellow);
   }
 
   .brutal-btn {

@@ -1,87 +1,71 @@
-# ⚡ DEVPULSE — DEVELOPER WELLNESS ANALYTICS
+# Pulse.IO — OPERATIONAL_DEVELOPER_TELEMETRY
 
-### [ ANALYZE // EVOLVE // SURVIVE ]
+![Pulse.IO Industrial Banner](https://via.placeholder.com/1200x400/000000/FF6B00?text=PULSE.IO+_+INDUSTRIAL_ENGINEERING)
 
-**DevPulse** is a high-density developer analytics platform that turns your GitHub commit history into an operational health report. Powered by **Groq AI (Llama 3.3)**, it provides raw sentiment tracking, burnout detection, and "Spotify-Wrapped" style weekly summaries for the modern engineer.
+> **"CODE_BRUTALIST. LIVE_WELL. SYSTEM_OPERATIONAL."**
 
----
+Pulse.IO is a high-intensity, AI-powered terminal for monitoring developer health and signal strength. It integrates directly with the GitHub ecosystem to analyze commit narratives, late-night pulse rates, and cognitive flow-states using Groq LLM inference.
 
-## 🛠️ THE CORE STACK
-- **CORE**: Node.js 25 // React 18 // Vite 6
-- **VISUALS**: Tailwind CSS // Brutalist UI System // Recharts
-- **INTELLIGENCE**: Groq Cloud (Llama 3.3) // Anthropic Claude (Fallback)
-- **DATABASE**: MongoDB Atlas (Cloud)
-- **SECURITY**: JWT // Passport.js (GitHub OAuth)
+## ⚡ CORE_CAPABILITIES
 
----
+- **VIBE_SENSING**: Real-time LLM parsing of commit messages to detect developer fatigue and system friction.
+- **BURNOUT_RADAR**: Hard-hitting metrics identifying late-night patterns and high-friction repositories.
+- **OPERATIONAL_FEED**: A brutalist command center for tracking your daily cognitive telemetry.
+- **WRAPPED_SIGNAL**: High-fidelity posterior generation for weekly and monthly performance briefings.
 
-## 🚀 KEY FEATURES
-- 🧠 **AI Intelligence Feed**: Real-time briefing for every commit message using LLMs.
-- 🔥 **Burnout Radar**: Operational risk assessment based on after-hours activity and sentiment drift.
-- 🎨 **Dev Wrapped**: Generative poster-style snapshots of your weekly developer vibe.
-- ⚡ **Flow Sentiment**: Threshold-based color coding (Green/Red) to detect flow state versus system friction.
-- 📡 **Live Operational Feed**: High-density dashboard showing real-time operational signals.
+## 🛠 TECH_STACK
 
----
+- **FRONTEND**: React 18, Vite, Tailwind CSS (Industrial Brutalist), Lucide Icons, Recharts.
+- **BACKEND**: Node.js, Express, Passport.js (GitHub OAuth Matrix).
+- **DATABASE**: MongoDB Atlas (Cloud Persistence).
+- **AI_ENGINE**: Groq SDK (Llama 3.3 70B Versatile).
+- **TELEMETRY**: Octokit (GitHub REST API Interface).
 
-## 🕹️ LOCAL INITIALIZATION
+## 🚀 INITIAL_DEPLOYMENT_PROTOCOLS
 
-### 1. CLONE AND INSTALL
-```bash
-git clone https://github.com/Asad101001/devpulse.git
-cd devpulse
-# Install Server
-cd server && npm install
-# Install Client
-cd ../client && npm install
-```
+### PREREQUISITES
+- Node.js v25+ (Engineered for modern runtimes)
+- MongoDB Atlas (Cloud Persistence Layer)
+- GitHub OAuth Application Credentials
+- Groq Cloud API Key (Intelligence Engine)
 
-### 2. CONFIGURATION (.env)
-Create a `.env` in the `server/` directory:
-```bash
+### ENVIRONMENT_SETUP
+Create a `.env` in the `server` directory:
+```env
 PORT=5000
-MONGO_URI=your_mongodb_atlas_uri
-SESSION_SECRET=your_random_secret
-JWT_SECRET=your_jwt_secret
-GITHUB_CLIENT_ID=your_github_client_id
-GITHUB_CLIENT_SECRET=your_github_client_secret
+MONGO_URI=your_mongodb_uri
+SESSION_SECRET=your_system_secret
+JWT_SECRET=your_auth_secret
+GITHUB_CLIENT_ID=your_id
+GITHUB_CLIENT_SECRET=your_secret
 GITHUB_CALLBACK_URL=http://localhost:5000/api/v1/auth/github/callback
-GROQ_API_KEY=your_groq_api_key
 CLIENT_URL=http://localhost:5173
+GROQ_API_KEY=your_groq_key
 ```
 
-### 3. RUN OPERATIONS
-```bash
-# Terminal 1: Backend
-cd server && npm run dev
-# Terminal 2: Frontend
-cd client && npm run dev
-```
+### SYSTEM_BOOT
+1. Clone the repository signal.
+2. Install dependency matrices:
+   ```bash
+   # Server_Init
+   cd server && npm install
+   # Client_Init
+   cd ../client && npm install
+   ```
+3. Run operational dev server:
+   ```bash
+   # Terminal_1 (Backend)
+   cd server && npm run dev
+   # Terminal_2 (Frontend)
+   cd client && npm run dev
+   ```
+
+## 📐 DESIGN_PHILOSOPHY
+Pulse.IO follows the **Industrial Brutalist Design Index**:
+- **HIGH_CONTRAST**: #FF6B00 (Orange), #FFD600 (Yellow), #000000 (Black).
+- **HARD_EDGES**: Thick 8px-10px solid borders.
+- **STARK_SHADOWS**: Hard, non-blurred offsets (Industrial Shadows).
+- **TYPOGRAPHY**: Outfit Black (Italicized for intensity).
 
 ---
-
-## ⚙️ DEPLOYMENT PROCESS
-
-DevPulse is designed for the **Free Tier Ecosystem** ($0 cost deployment).
-
-### PHASE A: BACKEND (Render.com)
-1. **Repository**: Connect your GitHub repo to Render.
-2. **Build Selection**: Root: `server` // Build: `npm install` // Start: `node index.js`.
-3. **Environment**: Add all variables from your `.env` (Use Production URLs).
-4. **Health Check**: Ensure `api/v1/health` returns `status: ok`.
-
-### PHASE B: FRONTEND (Vercel)
-1. **Repository**: Import the project as a Vercel project.
-2. **Configuration**: Root: `client` // Framework: Vite // Build Command: `npm run build`.
-3. **Production ENV**: `VITE_API_URL` should point to your Render app URL.
-4. **Routing**: Handled by the included `vercel.json` rewrite rules.
-
----
-
-## 📜 RECENT OPERATIONS
-Check the [WORK_LOG.md](WORK_LOG.md) for detailed implementation history and the [docs/](docs/) directory for full technical specifications.
-
----
-
-### [ SYSTEM STATUS: OPERATIONAL ]
-Developed by **Asad101001** for the Google Deepmind Advanced Agentic Coding Challenge.
+© 2026 PULSE.IO PLATFORM. ZERO_TRACKERS. ZERO_FLUFF. ALL_SIGNAL.

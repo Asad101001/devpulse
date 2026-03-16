@@ -55,6 +55,9 @@ const CommitSchema = new Schema({
   aiSummary: {
     type: String,
   },
+  aiRecommendation: {
+    type: String,
+  },
 }, {
   timestamps: true,
 });
