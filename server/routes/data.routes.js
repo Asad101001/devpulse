@@ -32,21 +32,48 @@ router.post('/sync', protect, catchAsync(async (req, res) => {
 router.get('/stats', protect, catchAsync(async (req, res) => {
   const userId = req.user._id;
   
-  // Basic Aggregation
-  const statsAggregate = await Commit.aggregate([
+  // Advanced Aggregation for reflective stats
+  const advancedStats = await Commit.aggregate([
     { $match: { userId } },
-    { 
+    {
       $group: {
         _id: null,
         avgSentiment: { $avg: "$sentimentScore" },
         avgBurnout: { $avg: "$burnoutIndex" },
         totalCommits: { $count: {} },
-        moodTags: { $push: "$moodTag" }
+        avgAdditions: { $avg: "$additions" },
+        avgDeletions: { $avg: "$deletions" },
+        avgFilesChanged: { $avg: "$filesChanged" },
+        moodTags: { $push: "$moodTag" },
+        sentimentStdDev: { $stdDevPop: "$sentimentScore" },
+        messages: { $push: "$message" }
       }
     }
   ]);
 
-  const stats = statsAggregate[0] || { avgSentiment: 50, avgBurnout: 0, totalCommits: 0, moodTags: [] };
+  const stats = advancedStats[0] || { 
+    avgSentiment: 50, 
+    avgBurnout: 0, 
+    totalCommits: 0, 
+    avgAdditions: 0, 
+    avgDeletions: 0, 
+    avgFilesChanged: 0, 
+    moodTags: [],
+    sentimentStdDev: 0,
+    messages: []
+  };
+
+  // Calculate Linguistic Precision (avg word count)
+  const totalWords = stats.messages.reduce((acc, msg) => acc + (msg?.split(/\s+/)?.length || 0), 0);
+  const linguisticPrecision = stats.totalCommits > 0 ? Math.round(totalWords / stats.totalCommits) : 0;
+
+  // Calculate Cognitive Load Score (0-100 normalized)
+  // Higher additions/deletions and files changed = higher load
+  const rawLoad = (stats.avgAdditions + stats.avgDeletions) / 10 + (stats.avgFilesChanged * 5);
+  const cognitiveLoad = Math.min(Math.round(rawLoad), 100);
+
+  // Calculate Signal Stability (100 - stdDev)
+  const signalStability = Math.max(Math.round(100 - (stats.sentimentStdDev || 0)), 0);
 
   // 1. Chart Data (Last 7 Days)
   const chartData = await Commit.aggregate([
@@ -54,7 +81,8 @@ router.get('/stats', protect, catchAsync(async (req, res) => {
     {
       $group: {
         _id: { $dayOfWeek: "$timestamp" },
-        score: { $avg: "$sentimentScore" }
+        score: { $avg: "$sentimentScore" },
+        load: { $avg: { $add: ["$additions", "$deletions"] } }
       }
     },
     { $sort: { "_id": 1 } }
@@ -63,7 +91,8 @@ router.get('/stats', protect, catchAsync(async (req, res) => {
   const days = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
   const formattedChart = chartData.map(d => ({
     name: days[d._id - 1],
-    score: Math.round(d.score)
+    score: Math.round(d.score),
+    load: Math.round(d.load / 10)
   }));
 
   // 2. Heatmap Data (Last 90 Days)
@@ -132,13 +161,16 @@ router.get('/stats', protect, catchAsync(async (req, res) => {
         topMood,
         starRepo: starRepo[0]?.repo?.name || 'Silent_System',
         peakDay: peakDayAgg[0] ? fullDays[peakDayAgg[0]._id - 1] : 'N/A',
-        lateNightCommits: lateNight
+        lateNightCommits: lateNight,
+        cognitiveLoad: `${cognitiveLoad}%`,
+        signalStability: `${signalStability}%`,
+        linguisticPrecision: `${linguisticPrecision} wpc`
       },
       repoList: repoList || [],
       recentCommits,
       heatmapData,
       chartData: formattedChart.length ? formattedChart : [
-        { name: 'M', score: 50 }, { name: 'T', score: 50 }, { name: 'W', score: 50 }
+        { name: 'M', score: 50, load: 20 }, { name: 'T', score: 50, load: 20 }, { name: 'W', score: 50, load: 20 }
       ],
       syncStatus: req.user.syncStatus,
       lastSyncedAt: req.user.lastSyncedAt || new Date()

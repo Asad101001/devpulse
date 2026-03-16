@@ -24,7 +24,7 @@ const Landing = () => {
           <div className="w-12 h-12 bg-black flex items-center justify-center border-4 border-black group">
             <Zap className="text-white w-8 h-8 group-hover:fill-white transition-all" strokeWidth={3} />
           </div>
-          <span className="text-4xl font-[900] tracking-tighter uppercase italic">Pulse IO</span>
+          <span className="text-4xl font-[900] tracking-tighter uppercase italic">DevPulse</span>
         </div>
         <button 
           onClick={onLogin}
@@ -153,7 +153,7 @@ const Landing = () => {
       {/* Marquee Bottom */}
       <div className="bg-black text-[#FFD600] py-8 whitespace-nowrap overflow-hidden border-b-[6px] border-black">
         <div className="inline-block animate-marquee font-[900] uppercase italic text-4xl tracking-tighter">
-          CODE BRUTALIST // LIVE WELL // PULSE OS // NO BULLSHIT // CODE BRUTALIST // LIVE WELL // PULSE OS // NO BULLSHIT // 
+          CODE BRUTALIST // LIVE WELL // DEVPULSE // NO BULLSHIT // CODE BRUTALIST // LIVE WELL // DEVPULSE // NO BULLSHIT // 
         </div>
       </div>
 
@@ -161,7 +161,7 @@ const Landing = () => {
       <footer className="p-16 bg-white flex flex-col items-center gap-10">
         <h2 className="text-6xl md:text-[8rem] font-[900] uppercase tracking-tighter italic text-center leading-none">Engineered For <br /><span className="text-[#FF6B00]">Intensity.</span></h2>
         <div className="flex flex-wrap justify-center gap-6">
-           <div className="px-8 py-4 bg-black text-white font-[900] uppercase italic border-4 border-black text-xl">© 2026 Pulse IO</div>
+           <div className="px-8 py-4 bg-black text-white font-[900] uppercase italic border-4 border-black text-xl">© 2026 DevPulse</div>
            <div className="px-8 py-4 bg-[#FF6B00] text-white font-[900] uppercase italic border-4 border-black text-xl tracking-widest animate-pulse">Status: Operational</div>
         </div>
       </footer>

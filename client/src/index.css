@@ -50,4 +50,58 @@ body {
   .brutal-card {
     @apply p-8 bg-white border-[4px] border-black text-black transition-all;
   }
+
+  /* 3D Visualizer CSS */
+  .cube-container {
+    width: 200px;
+    height: 200px;
+    perspective: 1000px;
+  }
+
+  .cube {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    transform-style: preserve-3d;
+    animation: spin 20s infinite linear;
+  }
+
+  .cube-face {
+    position: absolute;
+    width: 200px;
+    height: 200px;
+    border: 4px solid black;
+    opacity: 0.8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 40px;
+    font-weight: 900;
+  }
+
+  .front  { transform: rotateY(0deg) translateZ(100px); background: #FF6B00; }
+  .back   { transform: rotateY(180deg) translateZ(100px); background: #FFD600; }
+  .right  { transform: rotateY(90deg) translateZ(100px); background: white; }
+  .left   { transform: rotateY(-90deg) translateZ(100px); background: #FFD600; }
+  .top    { transform: rotateX(90deg) translateZ(100px); background: white; }
+  .bottom { transform: rotateX(-90deg) translateZ(100px); background: #FF6B00; }
+
+  @keyframes spin {
+    from { transform: rotateX(0deg) rotateY(0deg); }
+    to { transform: rotateX(360deg) rotateY(360deg); }
+  }
+
+  .glitch-text {
+    text-shadow: 2px 0 #FF6B00, -2px 0 #00E5FF;
+    animation: glitch 1s infinite linear alternate-reverse;
+  }
+
+  @keyframes glitch {
+    0% { transform: translate(0); }
+    20% { transform: translate(-2px, 2px); }
+    40% { transform: translate(-2px, -2px); }
+    60% { transform: translate(2px, 2px); }
+    80% { transform: translate(2px, -2px); }
+    100% { transform: translate(0); }
+  }
 }

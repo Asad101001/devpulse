@@ -43,6 +43,10 @@ const Dashboard = () => {
   const [stats, setStats] = React.useState(null);
   const [isSyncing, setIsSyncing] = React.useState(false);
   const [activeTab, setActiveTab] = React.useState('summary');
+  const [config, setConfig] = React.useState({
+    precision: 'standard',
+    density: 'M'
+  });
 
   const fetchStats = async () => {
     try {
@@ -74,6 +78,13 @@ const Dashboard = () => {
     }
   };
 
+  const handleReset = () => {
+    if (window.confirm('FATAL: This will wipe all local intelligence data and reset the sync matrix. Proceed?')) {
+      alert('SIGNAL_WIPED. Reloading system...');
+      window.location.reload();
+    }
+  };
+
 
   if (loading || (isAuthenticated && !stats)) {
     return (
@@ -97,7 +108,7 @@ const Dashboard = () => {
       <aside className="w-full md:w-60 bg-black text-white border-r-[6px] border-black flex flex-col sticky top-0 md:h-screen z-20">
         <div className="p-5 border-b-[6px] border-white flex items-center gap-3 bg-[#FF6B00]">
           <Zap className="text-white w-6 h-6" strokeWidth={3} />
-          <span className="text-xl font-[900] tracking-tighter uppercase italic">Pulse IO</span>
+          <span className="text-xl font-[900] tracking-tighter uppercase italic">DevPulse</span>
         </div>
 
         <nav className="flex-1 p-3 space-y-2">
@@ -133,11 +144,13 @@ const Dashboard = () => {
 
         {activeTab === 'summary' && (
           <div className="space-y-8">
-            {/* Real Stats Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            {/* Advanced Stats Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4">
               <StatBox label="Flow Sentiment" value={`${m.avgSentiment}%`} color="white" statusColor={getVibeColor(m.avgSentiment)} />
-              <StatBox label="Emot Resonance" value={m.emotionalResonance} color="white" />
               <StatBox label="Burnout Risk" value={`${m.avgBurnout}%`} color="white" statusColor={getBurnoutColor(m.avgBurnout)} />
+              <StatBox label="Cognitive Load" value={m.cognitiveLoad} color="white" />
+              <StatBox label="Signal Stability" value={m.signalStability} color="white" />
+              <StatBox label="Linguistic Prec" value={m.linguisticPrecision} color="white" />
               <StatBox label="Active Signals" value={m.totalCommits} color="black" textColor="white" />
             </div>
 
@@ -171,7 +184,30 @@ const Dashboard = () => {
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {/* Radar Chart */}
+                    {/* Advanced Composed Chart */}
+                    <div className="bg-white border-[6px] border-black p-5 shadow-[8px_8px_0px_0px_#000]">
+                        <h3 className="text-lg font-[900] uppercase italic mb-4 border-b-2 border-black pb-2 flex items-center gap-2">
+                           <BarChart size={18} className="text-[#FF6B00]" /> Signal Intensity Matrix
+                        </h3>
+                        <div className="h-[240px] w-full">
+                           <ResponsiveContainer width="100%" height="100%">
+                              <ReBarChart data={stats.chartData}>
+                                 <CartesianGrid strokeDasharray="3 3" stroke="#eee" vertical={false} />
+                                 <XAxis dataKey="name" axisLine={{ strokeWidth: 4 }} tickLine={false} tick={{ fontSize: 10, fontWeight: 900 }} />
+                                 <YAxis hide />
+                                 <Tooltip contentStyle={{ backgroundColor: '#000', border: 'none', borderRadius: '0', color: '#fff' }} cursor={{ fill: 'rgba(0,0,0,0.05)' }} />
+                                 <Bar dataKey="score" fill="#FF6B00" radius={[4, 4, 0, 0]} />
+                                 <Bar dataKey="load" fill="#000" radius={[4, 4, 0, 0]} />
+                              </ReBarChart>
+                           </ResponsiveContainer>
+                        </div>
+                        <div className="flex justify-center gap-4 mt-2 text-[9px] font-black uppercase italic">
+                           <div className="flex items-center gap-1"><span className="w-2 h-2 bg-[#FF6B00]"></span> Sentiment</div>
+                           <div className="flex items-center gap-1"><span className="w-2 h-2 bg-black"></span> Load</div>
+                        </div>
+                    </div>
+
+                    {/* Operational Radar */}
                     <div className="bg-white border-[6px] border-black p-5 shadow-[8px_8px_0px_0px_#000]">
                         <h3 className="text-lg font-[900] uppercase italic mb-4 border-b-2 border-black pb-2 flex items-center gap-2">
                            <Activity size={18} className="text-[#FF6B00]" /> Operational Radar
@@ -180,10 +216,10 @@ const Dashboard = () => {
                            <ResponsiveContainer width="100%" height="100%">
                               <RadarChart cx="50%" cy="50%" outerRadius="70%" data={[
                                  { subject: 'Intensity', A: m.avgSentiment, fullMark: 100 },
-                                 { subject: 'Focus', A: 100 - m.avgBurnout, fullMark: 100 },
-                                 { subject: 'Stability', A: parseInt(m.emotionalResonance), fullMark: 100 },
+                                 { subject: 'Stability', A: parseInt(m.signalStability), fullMark: 100 },
+                                 { subject: 'Cognitive', A: parseInt(m.cognitiveLoad), fullMark: 100 },
                                  { subject: 'Volume', A: Math.min(m.totalCommits * 2, 100), fullMark: 100 },
-                                 { subject: 'Frequency', A: stats.heatmapData?.length || 50, fullMark: 100 },
+                                 { subject: 'Precision', A: Math.min(parseInt(m.linguisticPrecision) * 5, 100), fullMark: 100 },
                               ]}>
                                  <PolarGrid stroke="#000" strokeWidth={1} />
                                  <PolarAngleAxis dataKey="subject" tick={{ fill: '#000', fontSize: 9, fontWeight: '900' }} />
@@ -192,61 +228,53 @@ const Dashboard = () => {
                            </ResponsiveContainer>
                         </div>
                     </div>
-
-                    {/* Heatmap */}
-                    <div className="bg-white border-[6px] border-black p-5 shadow-[8px_8px_0px_0px_#000]">
-                        <h3 className="text-lg font-[900] uppercase italic mb-4 border-b-2 border-black pb-2 flex items-center gap-2">
-                           <History size={18} className="text-[#FF6B00]" /> Signal Frequency
-                        </h3>
-                        <div className="grid grid-cols-10 gap-1.5 p-0.5 overflow-x-auto">
-                           {Array.from({ length: 70 }).map((_, i) => {
-                              const dateStr = new Date(Date.now() - (69-i) * 24*60*60*1000).toISOString().split('T')[0];
-                              const hasData = stats.heatmapData?.some(d => d._id === dateStr);
-                              return (
-                                <div key={i} title={dateStr} className={`aspect-square w-full border-2 border-black transition-all ${hasData ? 'bg-black scale-105 shadow-[1px_1px_0px_#FF6B00]' : 'bg-white opacity-20'}`}></div>
-                              );
-                           })}
-                        </div>
-                        <div className="mt-4 text-[9px] font-[900] uppercase bg-[#FFD600] border-2 border-black p-1.5 text-center italic">
-                           70 Cycle History Detected.
-                        </div>
-                    </div>
                 </div>
               </div>
 
-              {/* Wrapped Section */}
+              {/* Wrapped Section & 3D Visualizer */}
               <div className="lg:col-span-4 space-y-6">
                 <div className="bg-[#FF6B00] text-white p-6 border-[6px] border-black shadow-[10px_10px_0px_0px_#000] relative group">
                   <div className="absolute top-4 right-4 animate-pulse">
                     <Zap size={32} className="text-white fill-white" />
                   </div>
-                  <h3 className="text-2xl font-[900] uppercase italic mb-8 border-b-4 border-white pb-2 underline decoration-[4px]">Dev Wrapped</h3>
+                  <h3 className="text-2xl font-[900] uppercase italic mb-8 border-b-4 border-white pb-2 underline decoration-[4px]">Dev Report</h3>
                   <div className="space-y-4 font-[900] uppercase italic">
                       <div className="p-5 bg-black border-[4px] border-white shadow-[6px_6px_0px_#000]">
                         <div className="text-[9px] text-[#FFD600] mb-2 tracking-widest whitespace-nowrap">PEAK COGNITIVE MOOD</div>
-                        <div className="text-4xl" style={{color: getVibeColor(m.avgSentiment)}}>{m.topMood}</div>
+                        <div className="text-4xl glitch-text" style={{color: getVibeColor(m.avgSentiment)}}>{m.topMood}</div>
                       </div>
                       
                       <div className="p-3 bg-white text-black border-[2px] border-black font-bold text-[10px]">
-                        SYSTEM STATUS: <span className="text-[#FF6B00]">SYNCED AND READY</span><br/>
-                        IDENTITY: <span className="underline">{user?.username}</span>
+                        SYSTEM STATUS: <span className="text-[#FF6B00]">SYNCED</span><br/>
+                        RESONANCE: <span className="underline">{m.emotionalResonance}</span>
                       </div>
-
-                      <button 
-                        onClick={() => setShowWrappedModal(true)}
-                        className="w-full bg-white text-black py-5 border-4 border-black font-[900] text-xl uppercase flex items-center justify-center gap-3 hover:bg-[#FFD600] shadow-[8px_8px_0px_0px_#000] hover:translate-x-1 hover:translate-y-1 hover:shadow-none transition-all"
-                      >
-                        <ImageIcon size={28} /> GENERATE POSTER
-                      </button>
                   </div>
                 </div>
 
-                <div className="bg-white p-5 border-[6px] border-black space-y-3 shadow-[8px_8px_0px_#000]">
+                {/* 3D Cube Visualizer */}
+                <div className="bg-black p-8 border-[6px] border-black flex flex-col items-center justify-center gap-6 shadow-[10px_10px_0px_white]">
+                   <div className="cube-container scale-75">
+                      <div className="cube">
+                         <div className="cube-face front">⚡</div>
+                         <div className="cube-face back">⚡</div>
+                         <div className="cube-face right">P</div>
+                         <div className="cube-face left">D</div>
+                         <div className="cube-face top">V</div>
+                         <div className="cube-face bottom">S</div>
+                      </div>
+                   </div>
+                   <div className="text-center">
+                      <div className="text-[#FFD600] font-black text-xs uppercase tracking-widest mb-1 italic">Signal Geometry</div>
+                      <div className="text-white text-[9px] font-bold opacity-40 uppercase">Real-time vector stabilization active</div>
+                   </div>
+                </div>
+
+                <div className="bg-white p-5 border-[6px] border-black space-y-3 shadow-[8px_8px_0px_#FFD600]">
                    <h4 className="text-xl font-[900] uppercase italic flex items-center gap-2 border-b-2 border-black pb-2">
-                      <Shield size={20} className="text-[#FF6B00]" /> Integrity Report
+                      <Shield size={20} className="text-[#FF6B00]" /> Intelligence Statistics
                    </h4>
                    <p className="text-[10px] font-black leading-tight bg-[#FFD600]/20 p-3 border-2 border-black italic">
-                      ALL DATA ANALYZED LOCALLY VIA GROQ LLM.<br/>ZERO PERSISTENCE ON THIRD PARTY SERVERS.
+                      LOAD: {m.cognitiveLoad} | STABILITY: {m.signalStability}<br/>PRECISION: {m.linguisticPrecision}
                    </p>
                 </div>
               </div>
@@ -289,26 +317,54 @@ const Dashboard = () => {
                  <div className="space-y-3">
                     <label className="text-[9px] font-[900] uppercase tracking-widest opacity-60 italic">AI Inference Precision</label>
                     <div className="grid grid-cols-2 border-4 border-black overflow-hidden">
-                       <button className="bg-black text-white p-3 font-[900] uppercase italic text-xs">Standard Sys</button>
-                       <button className="bg-[#FFD600] text-black p-3 font-[900] uppercase italic border-l-4 border-black hover:bg-white transition-colors text-[10px]">High Res (PRO)</button>
+                       <button 
+                         onClick={() => setConfig(prev => ({ ...prev, precision: 'standard' }))}
+                         className={`p-3 font-[900] uppercase italic text-xs transition-colors ${config.precision === 'standard' ? 'bg-black text-white' : 'bg-white text-black hover:bg-gray-100'}`}
+                       >
+                         Standard Sys
+                       </button>
+                       <button 
+                         onClick={() => setConfig(prev => ({ ...prev, precision: 'high' }))}
+                         className={`p-3 font-[900] uppercase italic border-l-4 border-black transition-colors text-[10px] ${config.precision === 'high' ? 'bg-[#FFD600] text-black' : 'bg-white text-black hover:bg-[#FFD600]/20'}`}
+                       >
+                         High Res (PRO)
+                       </button>
                     </div>
                  </div>
 
                  <div className="space-y-3">
                     <label className="text-[9px] font-[900] uppercase tracking-widest opacity-60 italic">Visual Density</label>
                     <div className="flex gap-3">
-                       <button className="flex-1 bg-black text-white p-4 font-[900] text-xl shadow-[4px_4px_0px_#FF6B00]">L</button>
-                       <button className="flex-1 bg-[#FFD600] p-4 font-[900] text-xl border-4 border-black hover:bg-white transition-colors">M</button>
-                       <button className="flex-1 bg-white p-4 font-[900] text-xl border-4 border-black hover:bg-[#FFD600] transition-colors">S</button>
+                       {['L', 'M', 'S'].map((d) => (
+                         <button 
+                           key={d}
+                           onClick={() => setConfig(prev => ({ ...prev, density: d }))}
+                           className={`flex-1 p-4 font-[900] text-xl border-4 border-black transition-all ${config.density === d ? 'bg-black text-white shadow-[4px_4px_0px_#FF6B00]' : 'bg-white text-black hover:bg-[#FFD600]'}`}
+                         >
+                           {d}
+                         </button>
+                       ))}
                     </div>
                  </div>
 
                  <div className="pt-6 border-t-4 border-black space-y-4">
+                    <button 
+                      onClick={() => {
+                        alert('CONFIG_SYNCED: Operational parameters updated.');
+                      }}
+                      className="w-full bg-black text-[#FFD600] py-4 text-xl font-[900] uppercase italic border-4 border-black hover:bg-[#FF6B00] hover:text-white transition-all mb-4"
+                    >
+                      Apply Signal Transform
+                    </button>
+
                     <div className="flex items-center gap-2 p-3 bg-red-100 border-2 border-[#F87171] text-[#F87171] font-bold text-[9px] uppercase italic">
                        <Shield size={16} /> Danger: Irreversible Operation Matrix Detected
                     </div>
-                    <button className="w-full bg-[#F87171] text-white py-4 text-xl font-[900] uppercase italic border-4 border-black shadow-[6px_6px_0px_0px_#000] hover:shadow-none hover:bg-black transition-all">
-                       Factory Reset Signal
+                    <button 
+                      onClick={handleReset}
+                      className="w-full bg-[#F87171] text-white py-4 text-xl font-[900] uppercase italic border-4 border-black shadow-[6px_6px_0px_0px_#000] hover:shadow-none hover:bg-black transition-all"
+                    >
+                      Factory Reset Signal
                     </button>
                  </div>
               </div>
