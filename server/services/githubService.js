@@ -116,7 +116,7 @@ export const syncRepoCommits = async (user, repo) => {
       // Fallback to defaults if detail fetch fails
     }
 
-    await sleep(100); 
+    await sleep(300); 
 
     const commit = await Commit.findOneAndUpdate(
       { sha: commitData.sha },

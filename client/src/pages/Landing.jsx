@@ -1,3 +1,4 @@
+import React, { useEffect } from 'react';
 import { useAuth } from '../context/AuthContext.jsx';
 import { useNavigate } from 'react-router-dom';
 import { Github, ArrowRight, Zap, Shield, Cpu, BarChart3, Activity, Command } from 'lucide-react';
@@ -13,7 +14,7 @@ const Landing = () => {
   }, [isAuthenticated, loading, navigate]);
 
   const onLogin = () => {
-    const apiBase = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+    const apiBase = import.meta.env.VITE_API_URL || window.location.origin;
     window.location.href = `${apiBase}/api/v1/auth/github`;
   };
 

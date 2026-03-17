@@ -28,8 +28,10 @@ app.use(helmet({
     directives: {
       ...helmet.contentSecurityPolicy.getDefaultDirectives(),
       "script-src": ["'self'", "'unsafe-inline'", "cdnjs.cloudflare.com"],
-      "img-src": ["'self'", "data:", "*.githubusercontent.com", "via.placeholder.com"],
-      "connect-src": ["'self'", "https://devpulse-app.onrender.com", "http://localhost:5000"]
+      "img-src": ["'self'", "data:", "*.githubusercontent.com", "via.placeholder.com", "https://*.githubusercontent.com"],
+      "style-src": ["'self'", "'unsafe-inline'", "fonts.googleapis.com"],
+      "font-src": ["'self'", "fonts.gstatic.com"],
+      "connect-src": ["'self'", "https://*.onrender.com", "https://devpulse-app.onrender.com", "http://localhost:5000"]
     },
   },
 }));

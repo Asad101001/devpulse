@@ -4,14 +4,14 @@ dotenv.config();
 
 const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
 
-export async function analyzeCommitSentiment(commitMessage) {
+export async function analyzeCommitSentiment(commitMessage, retryCount = 0) {
   const systemPrompt = `
     You are the Pulse IO Advanced Sentiment Engine.
     Analyze the following commit message and provide a professional yet industrial JSON response.
     Fields:
     - score: (0-100) where 100 is extremely positive/productive and 0 is extremely frustrated.
     - burnout: (0-100) likelihood of burnout based on tone and complexity.
-    - vibe: (string) one word category (e.g., Focused, Exhausted, Agile, Efficient, Chaotic).
+    - vibe: (string) one word category (e.g., Focused, Agile, Efficent).
     - briefing: (string) 5-word max concise summary.
     - recommendation: (string) 15-word max actionable engineering advice.
     Return ONLY JSON.
@@ -19,7 +19,7 @@ export async function analyzeCommitSentiment(commitMessage) {
 
   try {
     const res = await groq.chat.completions.create({
-      model: 'llama-3.3-70b-versatile',
+      model: 'llama-3.1-8b-instant',
       messages: [
         { role: 'system', content: systemPrompt },
         { role: 'user', content: commitMessage || 'EMPTY_SIGNAL' }
@@ -36,6 +36,14 @@ export async function analyzeCommitSentiment(commitMessage) {
       recommendation: parsed.recommendation ?? 'Maintain operational tempo.'
     };
   } catch (err) {
+    // 429 Rate Limit Handling with Backoff
+    if (err.status === 429 && retryCount < 3) {
+      const waitTime = (retryCount + 1) * 2000;
+      console.log(`[AI] Rate limit hit. Retrying in ${waitTime}ms... (Attempt ${retryCount + 1}/3)`);
+      await sleep(waitTime);
+      return analyzeCommitSentiment(commitMessage, retryCount + 1);
+    }
+    
     console.error('[AI] Signal Processing FAILED:', err.message);
     return { 
       score: 50, 
@@ -58,7 +66,7 @@ export async function generateExecutiveDirective(statsSummary) {
 
   try {
     const res = await groq.chat.completions.create({
-      model: 'llama-3.3-70b-versatile',
+      model: 'llama-3.1-8b-instant',
       messages: [{ role: 'system', content: systemPrompt }],
       max_tokens: 100,
     });
