@@ -1,80 +1,77 @@
 # DEVPULSE // INDUSTRIAL_SIGNAL_ANALYSIS
+## VERSION_1.0.4_STABLE
 
 > **"ALL_SIGNAL. ZERO_FLUFF. SYSTEM_STABILIZED."**
 
-DevPulse is a high-fidelity engineer resonance platform. It converts raw commit narratives into actionable cognitive load telemetry using **Groq-powered Llama 3.3** inference. Designed for high-intensity developers who operate on direct-to-metal principles.
+**DevPulse** is a high-intensity engineering telemetry platform. It bypasses conventional "productivity" metrics to analyze the raw cognitive pressure and emotional resonance of a developer's output. Built for engineers who operate at high saturation, DevPulse uses **Groq-accelerated Llama 3.3** to parse commit narratives into actionable intelligence.
 
 ---
 
-## ⚡ CORE_SYSTEM_CAPABILITIES
+## ⚡ CORE_SYSTEM_TELEMETRY
 
-- **COG_LOAD_MATRIX**: Real-time parsing of commit complexity, code churn (additions/deletions), and files changed.
-- **NEURAL_SENTIMENT**: High-speed LLM inference (llama-3.3-70b) to detect frustration, agility, and burnout risk.
-- **INDUSTRIAL_DASHBOARD**: A stark, brutalist command center built with Recharts for visual precision and ZERO data persistence.
-- **WRAPPED_REPORTING**: Automated extraction of peak activity signals and executive engineering directives.
+| SIGNAL | ENGINE | DESCRIPTION |
+|:---|:---|:---|
+| **COG_LOAD** | `DevPulse_Logic_V1` | Real-time calculation of complexity based on additions, deletions, and file flux. |
+| **FATIGUE_INDEX** | `Llama-3.3-70B` | LLM-driven inference detecting burnout, frustration, and chaotic signal bursts. |
+| **PULSE_RADAR** | `Recharts_Industrial` | Visual mapping of technical precision vs. emotional stability across 90-day cycles. |
+| **DIRECTIVE_GEN** | `Deep_Signal_AI` | Daily high-authority engineering advice generated from aggregate telemetry. |
 
-## 🏗 SYSTEM_ARCHITECTURE
+## 🏗 SYSTEM_OPERATIONAL_FLOW
 
-```mermaid
-graph TD
-    Client[Vite/React Dashboard] -->|JWT Auth| API[Express 5 Server]
-    API -->|OAuth| GitHub[GitHub API / Octokit]
-    API -->|Inference| Groq[Groq Llama 3.3]
-    API -->|Persistence| Mongo[MongoDB Atlas]
-    Groq -->|JSON Signal| API
-    GitHub -->|Commit Stream| API
-```
+1.  **SIGNAL_ACQUISITION**: Auth via GitHub OAuth 2.0. Octokit SDK intercepts the last 40 commit signals per repository.
+2.  **INFERENCE_PROCESSING**: Commits are batched and transmitted to the **Groq High-Throughput Matrix**.
+3.  **DATA_POSTING**: JSON telemetry (Sentiment, Burnout, Mood) is persisted to **MongoDB Atlas**.
+4.  **INTELLIGENCE_DISPLAY**: Dashboard renders real-time charts, burnout risk heatmaps, and signal-stabilized reports.
 
 ## 🚀 BOOT_PROTOCOLS
 
-### 1. Requirements
-- **Node.js**: v20+ (v25 recommended)
-- **Database**: MongoDB instance (Atlas clusters supported)
-- **API Keys**: GitHub OAuth App Creds + Groq Cloud API Key
+### 1. ENVIRONMENT_HARDENING
+Ensure a `.env` exists in the root directory with the following variables:
 
-### 2. Environment (server/.env)
 ```env
+# SERVER_CORE
 PORT=5000
 NODE_ENV=development
 MONGO_URI=mongodb+srv://...
 SESSION_SECRET=...
 JWT_SECRET=...
+
+# GITHUB_MATRIX
 GITHUB_CLIENT_ID=...
 GITHUB_CLIENT_SECRET=...
 GITHUB_CALLBACK_URL=http://localhost:5000/api/v1/auth/github/callback
-CLIENT_URL=http://localhost:5173
+
+# AI_ENGINE (GROQ)
 GROQ_API_KEY=...
+
+# CLIENT_ROUTING
+CLIENT_URL=http://localhost:5173
+VITE_API_URL=http://localhost:5000
 ```
 
-### 3. Execution
+### 2. SYSTEM_INITIALIZATION
+Run these commands from the **root** directory:
+
 ```bash
-# 1. Install dependencies
+# INSTALL_ALL_MATRICES
 npm run install:all
 
-# 2. Start combined dev environment
+# BOOT_OPERATIONAL_MODE
 npm run dev
-# [Port 5000]: API Server
-# [Port 5173]: Frontend Client
 ```
 
-## 🛠 DEPLOYMENT_INDEX
+## 🛡 SECURITY_MATRIX
+- **JWT_AUTH**: Stateless verification on every API request.
+- **RATE_LIMITING**: 100 requests per 15-minute window per IP to prevent signal interference.
+- **ZERO_USER_TRACKING**: No third-party trackers. No data leakage. No cookies outside of auth sessions.
+- **ENCRYPTION**: Signal transmission secured via TLS/SSL and origin-locking CORS logic.
 
-### Rendering (Backend)
-- Use **Render** or **Railway**. 
-- Environment: Set `NODE_ENV` to `production`.
-- Build Command: `npm install`.
-- Start Command: `npm start`.
-
-### Vercel (Frontend)
-- Build Command: `npm run build`.
-- Output Directory: `dist`.
-- Framework Preset: `Vite`.
-
-## 📐 DESIGN_PHILOSOPHY
-- **STARK_CONTRAST**: #FF6B00 (Orange), #FFD600 (Yellow), #000000 (Black).
-- **HEAVY_EDGES**: Uniform 6px+ solid black borders.
-- **BRUTALIST_TYPE**: Outfit Black (Italicized for urgency).
-- **NO_GRADIENTS**: Solid color blocking for maximum cognitive focus.
+## 📐 INDUSTRIAL_DESIGN_INDEX
+- **PRIMARY_BASE**: #000000 (Void Black)
+- **SIGNAL_ACCENT**: #FF6B00 (High-Intensity Orange)
+- **COMMAND_ACCENT**: #FFD600 (Warning Yellow)
+- **TYPEFACE**: Outfit Black (Italicized for urgency)
+- **EDGES**: 6px hard-solid borders on all interaction matrices.
 
 ---
-© 2026 DEVPULSE PLATFORM // AUTHORIZED_SIGNAL_ONLY // [devpulse.io](https://devpulse.io)
+© 2026 DEVPULSE PLATFORM // AUTHORIZED_ACCESS_ONLY // [devpulse.io](https://devpulse.io)

@@ -91,7 +91,7 @@ const Landing = () => {
       </main>
 
       <section className="bg-black text-white py-24 px-10 relative border-b-[6px] border-black">
-        <div className="absolute top-20 left-10 text-[15rem] font-[900] opacity-5 select-none pointer-events-none -rotate-6">Pulse IO</div>
+        <div className="absolute top-20 left-10 text-[15rem] font-[900] opacity-5 select-none pointer-events-none -rotate-6">DEVPULSE</div>
         <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-12 relative z-10">
           <LandingFeature 
             icon={<Cpu size={48} strokeWidth={3} />}
