@@ -172,8 +172,10 @@ export const syncAllForUser = async (userInput) => {
     // 2. Fetch and sync repos
     const repos = await syncUserRepos(user);
 
-    // 3. Sync commits for each repo in parallel
-    await Promise.all(repos.map(repo => syncRepoCommits(user, repo)));
+    // 3. Sync commits for each repo sequentially to respect system limits
+    for (const repo of repos) {
+      await syncRepoCommits(user, repo);
+    }
 
     // 4. Update user sync status and lastSyncedAt
     await User.findByIdAndUpdate(user._id, { 

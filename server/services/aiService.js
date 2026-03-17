@@ -51,6 +51,30 @@ export async function analyzeCommitSentiment(commitMessage) {
 }
 
 /**
+ * Generates a high-level executive directive based on aggregate stats
+ */
+export async function generateExecutiveDirective(statsSummary) {
+  const systemPrompt = `
+    You are the DevPulse Central Intelligence. 
+    Analyze the provided engineering telemetry and output a single, powerful, and actionable directive.
+    Tone: Industrial, Cold, High-Authority (e.g., HAL 9000 or a Terminal).
+    Constraint: 20 words maximum.
+    Stats: ${statsSummary}
+  `;
+
+  try {
+    const res = await groq.chat.completions.create({
+      model: 'llama-3.3-70b-versatile',
+      messages: [{ role: 'system', content: systemPrompt }],
+      max_tokens: 100,
+    });
+    return res.choices[0].message.content.trim();
+  } catch (err) {
+    return "Maintain high-fidelity output. Monitor cognitive friction.";
+  }
+}
+
+/**
  * Utility to split array into chunks
  */
 export function chunkCommits(arr, size) {

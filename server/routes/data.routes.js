@@ -3,7 +3,9 @@ import { protect } from '../middleware/auth.middleware.js';
 import { syncAllForUser } from '../services/githubService.js';
 import Commit from '../models/Commit.model.js';
 import Repo from '../models/Repo.model.js';
+import User from '../models/User.model.js';
 import { catchAsync } from '../utils/catchAsync.js';
+import { generateExecutiveDirective } from '../services/aiService.js';
 
 const router = express.Router();
 
@@ -167,22 +169,9 @@ router.get('/stats', protect, catchAsync(async (req, res) => {
     .limit(5)
     .populate('repoId', 'name');
 
-  // 5. Generate Aggregated Directive (The Wellness Directive)
-  const recentMessages = stats.messages.slice(0, 15).join('; ');
-  let executiveDirective = "Maintain high-fidelity output. Monitor cognitive friction.";
-  
-  if (stats.totalCommits > 0) {
-    // We could call Groq here for a single summary, but for now we'll derive from metrics
-    if (stats.avgBurnout > 60) {
-        executiveDirective = "CRITICAL: High burnout pulse detected. Immediate system cooling required. Halt all non-essential commits.";
-    } else if (cognitiveLoad > 70) {
-        executiveDirective = "WARNING: Heavy cognitive load. Engineering efficiency is degrading. Prioritize code stabilization over new features.";
-    } else if (stats.avgSentiment < 40) {
-        executiveDirective = "SIGNAL_FRICTION: Tone indicates frustration. Perform system reset and isolate root causes of friction.";
-    } else {
-        executiveDirective = "OPTIMAL: Engineering rhythm is stable. Continue high-intensity cycles with standard maintenance.";
-    }
-  }
+  // 5. Generate Aggregated Directive (True AI Wellness Directive)
+  const statsSummary = `Total Commits: ${stats.totalCommits}, Avg Sentiment: ${stats.avgSentiment}%, Avg Burnout: ${stats.avgBurnout}%, Cognitive Load: ${cognitiveLoad}%, Recent Messages: ${stats.messages.slice(0, 10).join('; ')}`;
+  const executiveDirective = await generateExecutiveDirective(statsSummary);
 
   res.status(200).json({
     success: true,
