@@ -162,7 +162,6 @@ const Dashboard = () => {
 
   return (
     <div className={`min-h-screen bg-white text-black font-['Outfit'] flex flex-col md:flex-row overflow-hidden ${config.density === 'S' ? 'text-sm' : config.density === 'L' ? 'text-lg' : 'text-base'}`}>
-      {/* Notification Matrix */}
       {notification && (
         <div className={`fixed top-6 right-6 z-[120] p-4 border-[4px] border-black shadow-[6px_6px_0px_#000] font-black uppercase italic animate-in slide-in-from-right duration-300 ${
           notification.type === 'error' ? 'bg-red-500 text-white' : 
@@ -171,7 +170,6 @@ const Dashboard = () => {
           {notification.msg}
         </div>
       )}
-      {/* Override Modal matrix */}
       {overrideModal && (
         <div className="fixed inset-0 z-[110] bg-black/90 backdrop-blur-sm flex items-center justify-center p-4">
           <div className="bg-white border-[8px] border-black max-w-md w-full p-8 shadow-[20px_20px_0px_#F87171] animate-in zoom-in duration-200">
@@ -196,7 +194,6 @@ const Dashboard = () => {
           </div>
         </div>
       )}
-      {/* Sidebar */}
       <aside className="w-full md:w-60 bg-black text-white border-r-[6px] border-black flex flex-col sticky top-0 md:h-screen z-20">
         <div className="p-5 border-b-[6px] border-white flex items-center gap-3 bg-[#FF6B00]">
           <Zap className="text-white w-6 h-6" strokeWidth={3} />
@@ -217,7 +214,6 @@ const Dashboard = () => {
         </div>
       </aside>
 
-      {/* Main Content */}
       <main className={`flex-1 bg-[#FFD600] border-l-[6px] border-black p-4 md:p-6 space-y-6 overflow-y-auto h-screen selection:bg-black selection:text-[#FFD600] ${config.density === 'S' ? 'gap-2' : config.density === 'L' ? 'gap-10' : 'gap-6'}`}>
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b-[6px] border-black pb-6">
           <div>
@@ -237,7 +233,6 @@ const Dashboard = () => {
 
         {activeTab === 'summary' && (
           <div className="space-y-8">
-            {/* Advanced Stats Grid */}
             <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4">
               <StatBox label="Flow Sentiment" value={`${m.avgSentiment}%`} desc="Average cognitive tone of commits." color="white" statusColor={getVibeColor(m.avgSentiment)} />
               <StatBox label="Burnout Risk" value={`${m.avgBurnout}%`} desc="Intensity vs recovery balance." color="white" statusColor={getBurnoutColor(m.avgBurnout)} />
@@ -248,7 +243,6 @@ const Dashboard = () => {
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-              {/* AI Showroom */}
               <div className="lg:col-span-8 flex flex-col gap-6">
                 <div className="bg-white border-[6px] border-black p-6 shadow-[10px_10px_0px_0px_#000]">
                   <h2 className="text-2xl font-[900] uppercase italic tracking-tighter mb-6 border-b-4 border-black pb-3 flex items-center gap-3">
@@ -277,7 +271,6 @@ const Dashboard = () => {
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {/* Advanced Composed Chart */}
                     <div className="bg-white border-[6px] border-black p-5 shadow-[8px_8px_0px_0px_#000]">
                         <h3 className="text-lg font-[900] uppercase italic mb-4 border-b-2 border-black pb-2 flex items-center gap-2">
                            <BarChart size={18} className="text-[#FF6B00]" /> Signal Intensity Matrix
@@ -313,7 +306,6 @@ const Dashboard = () => {
                         </div>
                     </div>
 
-                    {/* Operational Radar */}
                     <div className="bg-white border-[6px] border-black p-5 shadow-[8px_8px_0px_0px_#000]">
                         <h3 className="text-lg font-[900] uppercase italic mb-4 border-b-2 border-black pb-2 flex items-center gap-2">
                            <Activity size={18} className="text-[#FF6B00]" /> Operational Radar
@@ -337,7 +329,6 @@ const Dashboard = () => {
                 </div>
               </div>
 
-              {/* Wrapped Section & 3D Visualizer */}
               <div className="lg:col-span-4 space-y-6">
                 <div className="bg-[#FF6B00] text-white p-6 border-[6px] border-black shadow-[10px_10px_0px_0px_#000] relative group">
                   <div className="absolute top-4 right-4 animate-pulse">
@@ -362,7 +353,6 @@ const Dashboard = () => {
                   </div>
                 </div>
 
-                {/* Operational Health Metrics */}
                 <div className="bg-black p-8 border-[6px] border-black flex flex-col gap-6 shadow-[10px_10px_0px_white]">
                    <h3 className="text-[#FFD600] font-[900] uppercase italic border-b-2 border-[#FFD600]/20 pb-2">Operational Health Index</h3>
                    <div className="space-y-4">
@@ -435,7 +425,6 @@ const Dashboard = () => {
                 <div className="absolute inset-0 opacity-10 pointer-events-none" 
                      style={{ backgroundImage: 'radial-gradient(#FF6B00 2px, transparent 2px)', backgroundSize: '24px 24px' }}></div>
                 
-                {/* Header */}
                 <div className="relative z-10 flex justify-between items-start">
                    <div>
                       <div className="bg-[#FF6B00] text-white px-3 py-1 text-[10px] font-[900] uppercase italic border-2 border-black inline-block mb-2">Signal: 2026.03</div>
@@ -444,7 +433,6 @@ const Dashboard = () => {
                    <Zap className="text-[#FFD600] fill-[#FFD600] w-12 h-12" strokeWidth={3} />
                 </div>
 
-                {/* Body Metrics */}
                 <div className="relative z-10 space-y-6">
                    <div className="space-y-1">
                       <div className="text-[10px] font-black text-[#FF6B00] uppercase tracking-widest italic">Primary Command Mood</div>
@@ -459,7 +447,6 @@ const Dashboard = () => {
                    </div>
                 </div>
 
-                {/* Footer Insight */}
                 <div className="relative z-10 p-6 bg-[#FFD600] border-[6px] border-black rotate-[-2deg] shadow-[8px_8px_0px_#FF6B00]">
                    <div className="text-[10px] font-black text-black/40 uppercase tracking-widest mb-1 italic">Directive from Central Intelligence:</div>
                    <div className="text-lg font-[1000] text-black uppercase italic leading-tight leading-none tracking-tighter">{m.executiveDirective}</div>

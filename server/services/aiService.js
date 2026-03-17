@@ -4,9 +4,6 @@ dotenv.config();
 
 const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
 
-/**
- * Analyzes commit sentiment via Groq
- */
 export async function analyzeCommitSentiment(commitMessage) {
   const systemPrompt = `
     You are the Pulse IO Advanced Sentiment Engine.
@@ -50,9 +47,6 @@ export async function analyzeCommitSentiment(commitMessage) {
   }
 }
 
-/**
- * Generates a high-level executive directive based on aggregate stats
- */
 export async function generateExecutiveDirective(statsSummary) {
   const systemPrompt = `
     You are the DevPulse Central Intelligence. 
@@ -74,18 +68,12 @@ export async function generateExecutiveDirective(statsSummary) {
   }
 }
 
-/**
- * Utility to split array into chunks
- */
 export function chunkCommits(arr, size) {
   return Array.from({ length: Math.ceil(arr.length / size) }, (_, i) =>
     arr.slice(i * size, i * size + size)
   );
 }
 
-/**
- * Utility for sleep
- */
 export function sleep(ms) {
     return new Promise((r) => setTimeout(r, ms));
 }

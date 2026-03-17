@@ -1,16 +1,27 @@
-import React from 'react';
 import { useAuth } from '../context/AuthContext.jsx';
+import { useNavigate } from 'react-router-dom';
 import { Github, ArrowRight, Zap, Shield, Cpu, BarChart3, Activity, Command } from 'lucide-react';
 
 const Landing = () => {
+  const { isAuthenticated } = useAuth();
+  const navigate = useNavigate();
+
   const onLogin = () => {
     const apiBase = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+    console.log('[Auth] Initiating GitHub OAuth redirect to:', `${apiBase}/api/v1/auth/github`);
     window.location.href = `${apiBase}/api/v1/auth/github`;
+  };
+
+  const onViewStats = () => {
+    if (isAuthenticated) {
+      navigate('/dashboard');
+    } else {
+      onLogin();
+    }
   };
 
   return (
     <div className="min-h-screen bg-[#FF6B00] text-black font-['Outfit'] selection:bg-black selection:text-[#FFD600] overflow-x-hidden">
-      {/* Marquee Top */}
       <div className="bg-black text-white py-3 border-b-[6px] border-black whitespace-nowrap overflow-hidden">
         <div className="inline-block animate-marquee font-[900] uppercase italic text-2xl tracking-tighter">
           OPERATIONAL ANALYTICS // SIGNAL STRENGTH REPORTING // BURNOUT DETECTION MATRIX // GROQ POWERED INFERENCE // NO USER TRACKING // END TO END SIGNAL ENCRYPTION // 
@@ -18,7 +29,6 @@ const Landing = () => {
         </div>
       </div>
 
-      {/* Header */}
       <nav className="border-b-[6px] border-black p-6 flex justify-between items-center bg-[#FFD600] sticky top-0 z-50">
         <div className="flex items-center gap-4">
           <div className="w-12 h-12 bg-black flex items-center justify-center border-4 border-black group">
@@ -28,13 +38,13 @@ const Landing = () => {
         </div>
         <button 
           onClick={onLogin}
-          className="bg-black text-white px-8 py-3 font-[900] text-lg uppercase italic border-4 border-black shadow-[6px_6px_0px_#FF6B00] hover:shadow-none hover:translate-x-2 hover:translate-y-2 transition-all"
+          className="bg-black text-white px-6 py-2 font-[900] text-base uppercase italic border-4 border-black shadow-[4px_4px_0px_#FF6B00] hover:shadow-none hover:translate-x-1 hover:translate-y-1 transition-all flex items-center gap-2"
         >
-          Initiate Auth
+          <Github size={20} strokeWidth={3} />
+          Connect GitHub
         </button>
       </nav>
 
-      {/* Hero Section */}
       <main className="grid grid-cols-1 lg:grid-cols-12 gap-0 border-b-[6px] border-black bg-white">
         <div className="lg:col-span-7 flex flex-col justify-center gap-8 p-10 lg:p-20 border-r-[6px] border-black">
           <div className="inline-block bg-[#FF6B00] text-white px-4 py-1 font-[900] uppercase text-xs self-start rotate-[-2deg] border-2 border-black">
@@ -48,11 +58,11 @@ const Landing = () => {
             Real-time signal analysis. Burnout risk mitigation. Brutalist telemetry for the high-intensity engineer.
           </p>
           <button 
-            onClick={onLogin}
+            onClick={onViewStats}
             className="group self-start bg-black text-[#FFD600] px-8 py-5 text-2xl font-[900] uppercase italic border-4 border-black flex items-center gap-4 shadow-[12px_12px_0px_0px_#FF6B00] hover:shadow-none hover:translate-x-4 hover:translate-y-4 transition-all"
           >
-            <Github size={32} strokeWidth={3} />
-            Connect GitHub
+            <BarChart3 size={32} strokeWidth={3} />
+            View Stats
             <ArrowRight size={32} className="group-hover:translate-x-4 transition-transform" />
           </button>
         </div>
@@ -75,7 +85,6 @@ const Landing = () => {
         </div>
       </main>
 
-      {/* Feature Grid */}
       <section className="bg-black text-white py-24 px-10 relative border-b-[6px] border-black">
         <div className="absolute top-20 left-10 text-[15rem] font-[900] opacity-5 select-none pointer-events-none -rotate-6">Pulse IO</div>
         <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-12 relative z-10">
@@ -102,7 +111,6 @@ const Landing = () => {
         </div>
       </section>
 
-      {/* Operational Pipeline */}
       <section className="bg-[#FF6B00] p-10 lg:p-24 flex flex-col gap-16 border-b-[6px] border-black">
          <h2 className="text-6xl md:text-8xl font-[900] uppercase italic tracking-tighter text-white leading-[0.85]">The Operational <br /> <span className="text-black bg-white px-4">Pipeline.</span></h2>
          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
@@ -113,7 +121,6 @@ const Landing = () => {
          </div>
       </section>
 
-      {/* Security Manifesto */}
       <section className="bg-white p-10 lg:p-24 grid grid-cols-1 lg:grid-cols-2 gap-24 border-b-[6px] border-black">
          <div className="space-y-10">
             <h2 className="text-5xl md:text-7xl font-[900] uppercase italic tracking-tighter leading-[0.95]">Hardened Security. <br /> Zero Proxies.</h2>
@@ -138,26 +145,23 @@ const Landing = () => {
          </div>
       </section>
 
-      {/* Call To Action */}
       <section className="bg-[#FFD600] py-40 flex flex-col items-center justify-center gap-16 text-center border-b-[6px] border-black">
          <h2 className="text-6xl md:text-9xl font-[900] uppercase italic tracking-tighter leading-[0.8]">Ready To <br /> <span className="bg-black text-white px-8 py-3">Calibrate?</span></h2>
-         <button 
-            onClick={onLogin}
+          <button 
+            onClick={onViewStats}
             className="group bg-black text-[#FFD600] px-16 py-8 text-4xl font-[900] uppercase italic border-8 border-black shadow-[20px_20px_0px_0px_#FF6B00] hover:shadow-none hover:translate-x-6 hover:translate-y-6 transition-all flex items-center gap-6"
           >
-            Initiate Sync
+            Launch Intelligence
             <Zap size={48} strokeWidth={4} className="group-hover:fill-[#FFD600] transition-all" />
-         </button>
+          </button>
       </section>
 
-      {/* Marquee Bottom */}
       <div className="bg-black text-[#FFD600] py-8 whitespace-nowrap overflow-hidden border-b-[6px] border-black">
         <div className="inline-block animate-marquee font-[900] uppercase italic text-4xl tracking-tighter">
           CODE BRUTALIST // LIVE WELL // DEVPULSE // NO BULLSHIT // CODE BRUTALIST // LIVE WELL // DEVPULSE // NO BULLSHIT // 
         </div>
       </div>
 
-      {/* Footer */}
       <footer className="p-16 bg-white flex flex-col items-center gap-10">
         <h2 className="text-6xl md:text-[8rem] font-[900] uppercase tracking-tighter italic text-center leading-none">Engineered For <br /><span className="text-[#FF6B00]">Intensity.</span></h2>
         <div className="flex flex-wrap justify-center gap-6">

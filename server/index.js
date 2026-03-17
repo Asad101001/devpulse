@@ -13,6 +13,7 @@ import helmet from 'helmet';
 import passport from 'passport';
 import session from 'express-session';
 import MongoStore from 'connect-mongo';
+import rateLimit from 'express-rate-limit';
 
 import { globalErrorHandler } from './middleware/errorHandler.js';
 import { AppError } from './utils/AppError.js';
@@ -22,8 +23,17 @@ import './config/passport.js';
 
 const app = express();
 
-// Security middleware
 app.use(helmet());
+app.disable('x-powered-by');
+
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // Limit each IP to 100 requests per windowMs
+  message: 'Too many requests from this IP, please try again after 15 minutes',
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+app.use('/api', limiter);
 const allowedOrigins = [process.env.CLIENT_URL, 'http://localhost:5173', 'http://localhost:3000'].filter(Boolean);
 
 app.use(cors({
@@ -37,10 +47,8 @@ app.use(cors({
   credentials: true,
 }));
 
-// Body parser
 app.use(express.json());
 
-// Session configuration
 app.use(session({
   secret: process.env.SESSION_SECRET || 'fallback-secret-for-dev',
   resave: false,
@@ -53,15 +61,12 @@ app.use(session({
   }
 }));
 
-// Passport initialization
 app.use(passport.initialize());
 app.use(passport.session());
 
-// Routes
 app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/data', dataRoutes);
 
-// Health check route
 app.get('/api/v1/health', (req, res) => {
   res.status(200).json({
     success: true,
@@ -70,7 +75,6 @@ app.get('/api/v1/health', (req, res) => {
   });
 });
 
-// Serve static assets in production
 if (process.env.NODE_ENV === 'production') {
   const distPath = path.join(__dirname, '../client/dist');
   app.use(express.static(distPath));
@@ -82,23 +86,19 @@ if (process.env.NODE_ENV === 'production') {
     res.sendFile(path.join(distPath, 'index.html'));
   });
 } else {
-  // Optional: Add a root route for development to confirm API is running
   app.get('/', (req, res) => {
     res.send('DevPulse API is running (Development Mode)...');
   });
 }
 
-// Handle undefined routes (404)
 app.use((req, res, next) => {
   next(new AppError(`Can't find ${req.originalUrl} on this server!`, 404));
 });
 
-// Global error handler
 app.use(globalErrorHandler);
 
 const PORT = process.env.PORT || 5000;
 
-// Connect to MongoDB
 if (process.env.MONGO_URI) {
   mongoose.connect(process.env.MONGO_URI)
     .then(() => {

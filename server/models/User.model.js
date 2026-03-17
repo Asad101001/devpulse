@@ -23,7 +23,6 @@ const UserSchema = new Schema({
   },
   githubAccessToken: {
     type: String,
-    // Store encrypted in production
   },
   lastSyncedAt: {
     type: Date,

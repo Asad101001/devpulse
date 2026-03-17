@@ -9,11 +9,6 @@ import { generateExecutiveDirective } from '../services/aiService.js';
 
 const router = express.Router();
 
-/**
- * @route   POST /api/v1/data/sync
- * @desc    Trigger a full GitHub sync for the authenticated user
- * @access  Private
- */
 router.post('/sync', protect, catchAsync(async (req, res) => {
   // Run sync in the background
   syncAllForUser(req.user).catch(err => {
@@ -26,11 +21,6 @@ router.post('/sync', protect, catchAsync(async (req, res) => {
   });
 }));
 
-/**
- * @route   GET /api/v1/data/stats
- * @desc    Fetch aggregated statistics for the dashboard
- * @access  Private
- */
 router.get('/stats', protect, catchAsync(async (req, res) => {
   const userId = req.user._id;
   const totalCommitsCount = await Commit.countDocuments({ userId });
@@ -88,7 +78,6 @@ router.get('/stats', protect, catchAsync(async (req, res) => {
   // Calculate Signal Stability (100 - stdDev)
   const signalStability = Math.max(Math.round(100 - (stats.sentimentStdDev || 0)), 0);
 
-  // 1. Chart Data (Last 7 Days)
   const chartData = await Commit.aggregate([
     { $match: { userId } },
     {
@@ -108,7 +97,6 @@ router.get('/stats', protect, catchAsync(async (req, res) => {
     load: Math.round(d.load / 10)
   }));
 
-  // 2. Heatmap Data (Last 90 Days)
   const ninetyDaysAgo = new Date();
   ninetyDaysAgo.setDate(ninetyDaysAgo.getDate() - 90);
   
@@ -123,7 +111,6 @@ router.get('/stats', protect, catchAsync(async (req, res) => {
     { $sort: { "_id": 1 } }
   ]);
 
-  // 3. Top Moods & Resonance
   const moodCounts = stats.moodTags.reduce((acc, mood) => {
     acc[mood] = (acc[mood] || 0) + 1;
     return acc;
@@ -131,7 +118,6 @@ router.get('/stats', protect, catchAsync(async (req, res) => {
   const topMood = Object.keys(moodCounts).sort((a,b) => moodCounts[b] - moodCounts[a])[0] || 'Unknown';
   const resonance = stats.totalCommits > 0 ? Math.round((moodCounts[topMood] / stats.totalCommits) * 100) : 0;
 
-  // 4. Wrapped Extracted Stats
   const starRepo = await Commit.aggregate([
     { $match: { userId } },
     { $group: { _id: "$repoId", count: { $sum: 1 } } },
@@ -157,7 +143,6 @@ router.get('/stats', protect, catchAsync(async (req, res) => {
   
   const repoCount = await Repo.countDocuments({ userId });
   
-  // Fetch repos with commit counts
   const repoListRaw = await Repo.find({ userId }).sort({ name: 1 }).lean();
   const repoList = await Promise.all(repoListRaw.map(async (repo) => {
     const count = await Commit.countDocuments({ repoId: repo._id });
@@ -174,7 +159,6 @@ router.get('/stats', protect, catchAsync(async (req, res) => {
     .limit(5)
     .populate('repoId', 'name');
 
-  // 5. Generate Aggregated Directive (Recent Signal Focus)
   const statsSummary = `RECENT_RELEVANCY_MATRIX: Sample_Size: ${stats.sampleSize}, Avg_Sentiment: ${stats.avgSentiment}%, Avg_Burnout: ${stats.avgBurnout}%, Cognitive_Load: ${cognitiveLoad}%, Latest_Messages: ${stats.messages.slice(0, 5).join('; ')}`;
   const executiveDirective = await generateExecutiveDirective(statsSummary);
 
@@ -212,11 +196,6 @@ router.get('/stats', protect, catchAsync(async (req, res) => {
   });
 }));
 
-/**
- * @route   POST /api/v1/data/reset
- * @desc    Factory Reset: Wipe all user repositories and commits
- * @access  Private
- */
 router.post('/reset', protect, catchAsync(async (req, res) => {
   const userId = req.user._id;
 

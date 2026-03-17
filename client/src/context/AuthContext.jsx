@@ -5,13 +5,13 @@ const AuthContext = createContext();
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
-  const [token, setTokenState] = useState(null);
+  const [token, setTokenState] = useState(localStorage.getItem('token'));
   const [loading, setLoading] = useState(true);
 
   const login = (newToken) => {
+    localStorage.setItem('token', newToken);
     setToken(newToken);
     setTokenState(newToken);
-    // Fetch user profile
     fetchUserProfile();
   };
 
@@ -21,6 +21,7 @@ export function AuthProvider({ children }) {
     } catch (err) {
       console.warn('Logout request failed:', err.message);
     } finally {
+      localStorage.removeItem('token');
       setToken(null);
       setTokenState(null);
       setUser(null);
