@@ -23,7 +23,16 @@ import './config/passport.js';
 
 const app = express();
 
-app.use(helmet());
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      ...helmet.contentSecurityPolicy.getDefaultDirectives(),
+      "script-src": ["'self'", "'unsafe-inline'", "cdnjs.cloudflare.com"],
+      "img-src": ["'self'", "data:", "*.githubusercontent.com", "via.placeholder.com"],
+      "connect-src": ["'self'", "https://devpulse-app.onrender.com", "http://localhost:5000"]
+    },
+  },
+}));
 app.disable('x-powered-by');
 
 const limiter = rateLimit({

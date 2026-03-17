@@ -74,4 +74,4 @@ npm run dev
 - **EDGES**: 6px hard-solid borders on all interaction matrices.
 
 ---
-© 2026 DEVPULSE PLATFORM // AUTHORIZED_ACCESS_ONLY // [devpulse.io](https://devpulse.io)
+© 2026 DEVPULSE PLATFORM // AUTHORIZED_ACCESS_ONLY // [devpulse-app.onrender.com](https://devpulse-app.onrender.com)
