@@ -5,7 +5,6 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 dotenv.config({ path: path.join(__dirname, '.env') });
-console.log('[Config] CLIENT_URL:', process.env.CLIENT_URL);
 
 import express from 'express';
 import mongoose from 'mongoose';
@@ -19,7 +18,7 @@ import { globalErrorHandler } from './middleware/errorHandler.js';
 import { AppError } from './utils/AppError.js';
 import authRoutes from './routes/auth.routes.js';
 import dataRoutes from './routes/data.routes.js';
-import './config/passport.js'; // This executes the passport strategy setup
+import './config/passport.js';
 
 const app = express();
 
@@ -103,19 +102,13 @@ const PORT = process.env.PORT || 5000;
 if (process.env.MONGO_URI) {
   mongoose.connect(process.env.MONGO_URI)
     .then(() => {
-      console.log('Connected to MongoDB successfully');
-      app.listen(PORT, () => {
-        console.log(`Server running on port ${PORT}`);
-      });
+      app.listen(PORT, () => {});
     })
     .catch((err) => {
       console.error('MongoDB connection error:', err);
     });
 } else {
-  console.warn('MONGO_URI not found in environment variables. Server starting without DB connection.');
-  app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
-  });
+  app.listen(PORT, () => {});
 }
 
 export default app;

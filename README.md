@@ -1,36 +1,36 @@
-# Pulse.IO — OPERATIONAL_DEVELOPER_TELEMETRY
+# DevPulse — INDUSTRIAL_DEVELOPER_TELEMETRY
 
-![Pulse.IO Industrial Banner](https://via.placeholder.com/1200x400/000000/FF6B00?text=PULSE.IO+_+INDUSTRIAL_ENGINEERING)
+![DevPulse Banner](https://via.placeholder.com/1200x400/000000/FF6B00?text=DEVPULSE+_+INDUSTRIAL_ENGINEERING)
 
-> **"CODE_BRUTALIST. LIVE_WELL. SYSTEM_OPERATIONAL."**
+> **"CODE_BRUTALIST. MINIMIZE_FRICTION. SYSTEM_STABILIZED."**
 
-Pulse.IO is a high-intensity, AI-powered terminal for monitoring developer health and signal strength. It integrates directly with the GitHub ecosystem to analyze commit narratives, late-night pulse rates, and cognitive flow-states using Groq LLM inference.
+DevPulse is a high-intensity, AI-powered telemetry dashboard for deep-cycle engineering analysis. It integrates with your GitHub ecosystem to parse commit narratives, detect cognitive load, and mitigate burnout through Groq Llama 3.3 inference.
 
-## ⚡ CORE_CAPABILITIES
+## ⚡ CORE_SIGNALS
 
-- **VIBE_SENSING**: Real-time LLM parsing of commit messages to detect developer fatigue and system friction.
-- **BURNOUT_RADAR**: Hard-hitting metrics identifying late-night patterns and high-friction repositories.
-- **OPERATIONAL_FEED**: A brutalist command center for tracking your daily cognitive telemetry.
-- **WRAPPED_SIGNAL**: High-fidelity posterior generation for weekly and monthly performance briefings.
+- **COGNITIVE_FEED**: Real-time LLM parsing of engineering narrative (commits) to detect fatigue and system friction.
+- **SIGNAL_STABILITY**: High-fidelity metrics tracking consistent output vs. chaotic bursts.
+- **BURNOUT_MATRIX**: Predictive analysis of engineering pulse based on late-night activity and complexity spikes.
+- **BRUTALIST_UI**: A stark, high-contrast command center built for industrial-grade focus.
 
 ## 🛠 TECH_STACK
 
-- **FRONTEND**: React 18, Vite, Tailwind CSS (Industrial Brutalist), Lucide Icons, Recharts.
+- **FRONTEND**: React 18, Vite, Tailwind (Industrial Brutalist Index), Lucide, Recharts.
 - **BACKEND**: Node.js, Express, Passport.js (GitHub OAuth Matrix).
 - **DATABASE**: MongoDB Atlas (Cloud Persistence).
 - **AI_ENGINE**: Groq SDK (Llama 3.3 70B Versatile).
 - **TELEMETRY**: Octokit (GitHub REST API Interface).
 
-## 🚀 INITIAL_DEPLOYMENT_PROTOCOLS
+## 🚀 BOOT_PROTOCOLS
 
-### PREREQUISITES
-- Node.js v25+ (Engineered for modern runtimes)
-- MongoDB Atlas (Cloud Persistence Layer)
+### REQUIREMENTS
+- Node.js v25+
+- MongoDB Atlas Instance
 - GitHub OAuth Application Credentials
-- Groq Cloud API Key (Intelligence Engine)
+- Groq Cloud API Key
 
-### ENVIRONMENT_SETUP
-Create a `.env` in the `server` directory:
+### ENVIRONMENT_CONFIG
+Create a `.env` in the `server` directory (and root for deployment):
 ```env
 PORT=5000
 MONGO_URI=your_mongodb_uri
@@ -38,34 +38,26 @@ SESSION_SECRET=your_system_secret
 JWT_SECRET=your_auth_secret
 GITHUB_CLIENT_ID=your_id
 GITHUB_CLIENT_SECRET=your_secret
-GITHUB_CALLBACK_URL=http://localhost:5000/api/v1/auth/github/callback
-CLIENT_URL=http://localhost:5173
+GITHUB_CALLBACK_URL=https://your-domain.com/api/v1/auth/github/callback
+CLIENT_URL=https://your-domain.com
 GROQ_API_KEY=your_groq_key
 ```
 
-### SYSTEM_BOOT
-1. Clone the repository signal.
-2. Install dependency matrices:
-   ```bash
-   # Server_Init
-   cd server && npm install
-   # Client_Init
-   cd ../client && npm install
-   ```
-3. Run operational dev server:
-   ```bash
-   # Terminal_1 (Backend)
-   cd server && npm run dev
-   # Terminal_2 (Frontend)
-   cd client && npm run dev
-   ```
+### SYSTEM_INITIALIZATION
+```bash
+# 1. Install Matrices
+npm run install:all
+
+# 2. Operational Start (Development)
+npm run dev
+```
 
 ## 📐 DESIGN_PHILOSOPHY
-Pulse.IO follows the **Industrial Brutalist Design Index**:
-- **HIGH_CONTRAST**: #FF6B00 (Orange), #FFD600 (Yellow), #000000 (Black).
-- **HARD_EDGES**: Thick 8px-10px solid borders.
-- **STARK_SHADOWS**: Hard, non-blurred offsets (Industrial Shadows).
-- **TYPOGRAPHY**: Outfit Black (Italicized for intensity).
+DevPulse adheres to the **Industrial Brutalist Design Index**:
+- **STARK_CONTRAST**: #FF6B00 (Orange), #FFD600 (Yellow), #000000 (Black).
+- **HARD_EDGES**: Thick 6px solid borders.
+- **HEAVY_SHADOWS**: Non-blurred 8px offsets (Industrial Shadows).
+- **INTENSE_TYPE**: Outfit Black (Italicized for urgency).
 
 ---
-© 2026 PULSE.IO PLATFORM. ZERO_TRACKERS. ZERO_FLUFF. ALL_SIGNAL.
+© 2026 DEVPULSE PLATFORM. ZERO_TRACKERS. ZERO_FLUFF. ALL_SIGNAL.

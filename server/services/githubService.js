@@ -10,11 +10,7 @@ import { analyzeCommitSentiment, sleep } from './aiService.js';
  * @returns {Octokit}
  */
 export const getOctokit = (token) => {
-  if (!token) {
-    console.error('[Octokit] Cannot initialize: Token is missing');
-    return null;
-  }
-  console.log('[Octokit] Initializing with token (length:', token.length, ')');
+  if (!token) return null;
   return new Octokit({ auth: token.trim() });
 };
 
@@ -31,15 +27,10 @@ export const syncUserRepos = async (user) => {
     throw new Error(`GitHub Authentication failed: ${err.message}`);
   }
   
-  console.log('[Sync] Fetching repositories for user...');
-  
-  // List all repositories where user is an owner or collaborator
   const { data: repos } = await octokit.rest.repos.listForAuthenticatedUser({
     visibility: 'all',
     per_page: 100,
   });
-
-  console.log(`[Sync] Found ${repos.length} repositories.`);
 
   const syncedRepos = [];
 
@@ -88,13 +79,21 @@ export const syncRepoCommits = async (user, repo) => {
   const newCommits = [];
 
   for (const commitData of commits) {
+    // Optimization: Check if commit already analyzed
+    const existingCommit = await Commit.findOne({ sha: commitData.sha });
+    
+    if (existingCommit && existingCommit.sentimentScore !== undefined) {
+      newCommits.push(existingCommit);
+      continue;
+    }
+
     const timestamp = new Date(commitData.commit.author.date);
     const hour = timestamp.getHours();
     const isAfterHours = hour >= 22 || hour < 6;
 
-    // AI Analysis
+    // AI Analysis only for new or unanalyzed signals
     const aiAnalysis = await analyzeCommitSentiment(commitData.commit.message);
-    await sleep(500); // Respect Groq rate limits
+    await sleep(250); // Reduced delay for faster throughput
 
     const commit = await Commit.findOneAndUpdate(
       { sha: commitData.sha },

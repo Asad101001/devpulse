@@ -54,7 +54,7 @@ const Dashboard = () => {
       setStats(data.data);
       setIsSyncing(data.data.syncStatus === 'syncing');
     } catch (err) {
-      console.error('Failed to fetch stats:', err.message);
+      // Silence background errors for clean production build
     }
   };
 
@@ -137,7 +137,7 @@ const Dashboard = () => {
           </div>
           {activeTab === 'summary' && (
             <button onClick={handleSync} disabled={isSyncing} className={`bg-black text-white px-6 py-3 text-lg font-[900] uppercase italic border-4 border-black flex items-center gap-2 transition-all shadow-[6px_6px_0px_0px_#FF6B00] ${isSyncing ? 'opacity-50' : 'hover:translate-x-1 hover:translate-y-1 hover:shadow-none'}`}>
-              <RefreshCw size={20} className={isSyncing ? 'animate-spin' : ''} /> {isSyncing ? 'Syncing...' : 'Force Sync'}
+              <RefreshCw size={20} className={isSyncing ? 'animate-spin' : ''} /> {isSyncing ? 'Syncing...' : 'Signal Sync'}
             </button>
           )}
         </div>
@@ -146,12 +146,12 @@ const Dashboard = () => {
           <div className="space-y-8">
             {/* Advanced Stats Grid */}
             <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4">
-              <StatBox label="Flow Sentiment" value={`${m.avgSentiment}%`} color="white" statusColor={getVibeColor(m.avgSentiment)} />
-              <StatBox label="Burnout Risk" value={`${m.avgBurnout}%`} color="white" statusColor={getBurnoutColor(m.avgBurnout)} />
-              <StatBox label="Cognitive Load" value={m.cognitiveLoad} color="white" />
-              <StatBox label="Signal Stability" value={m.signalStability} color="white" />
-              <StatBox label="Linguistic Prec" value={m.linguisticPrecision} color="white" />
-              <StatBox label="Active Signals" value={m.totalCommits} color="black" textColor="white" />
+              <StatBox label="Flow Sentiment" value={`${m.avgSentiment}%`} desc="Average cognitive tone of commits." color="white" statusColor={getVibeColor(m.avgSentiment)} />
+              <StatBox label="Burnout Risk" value={`${m.avgBurnout}%`} desc="Intensity vs recovery balance." color="white" statusColor={getBurnoutColor(m.avgBurnout)} />
+              <StatBox label="Cognitive Load" value={m.cognitiveLoad} desc="Commit complexity & scale." color="white" />
+              <StatBox label="Signal Stability" value={m.signalStability} desc="Consistency of engineering output." color="white" />
+              <StatBox label="Linguistic Prec" value={m.linguisticPrecision} desc="Technical detail in documentation." color="white" />
+              <StatBox label="Active Signals" value={m.totalCommits} desc="Total data points ingested." color="black" textColor="white" />
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
@@ -191,13 +191,26 @@ const Dashboard = () => {
                         </h3>
                         <div className="h-[240px] w-full">
                            <ResponsiveContainer width="100%" height="100%">
-                              <ReBarChart data={stats.chartData}>
+                              <ReBarChart data={stats.chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                                  <CartesianGrid strokeDasharray="3 3" stroke="#eee" vertical={false} />
                                  <XAxis dataKey="name" axisLine={{ strokeWidth: 4 }} tickLine={false} tick={{ fontSize: 10, fontWeight: 900 }} />
-                                 <YAxis hide />
-                                 <Tooltip contentStyle={{ backgroundColor: '#000', border: 'none', borderRadius: '0', color: '#fff' }} cursor={{ fill: 'rgba(0,0,0,0.05)' }} />
-                                 <Bar dataKey="score" fill="#FF6B00" radius={[4, 4, 0, 0]} />
-                                 <Bar dataKey="load" fill="#000" radius={[4, 4, 0, 0]} />
+                                 <YAxis domain={[0, 100]} axisLine={{ strokeWidth: 4 }} tick={{ fontSize: 10, fontWeight: 900 }} />
+                                 <Tooltip 
+                                    cursor={{ fill: 'rgba(0,0,0,0.05)' }}
+                                    content={({ active, payload }) => {
+                                      if (active && payload && payload.length) {
+                                        return (
+                                          <div className="bg-black text-white p-3 border-2 border-[#FF6B00] font-black uppercase text-[10px] italic">
+                                            <p>{`Sentiment: ${payload[0].value}%`}</p>
+                                            <p>{`Load: ${payload[1].value}%`}</p>
+                                          </div>
+                                        );
+                                      }
+                                      return null;
+                                    }}
+                                 />
+                                 <Bar dataKey="score" fill="#FF6B00" radius={[2, 2, 0, 0]} name="Sentiment" />
+                                 <Bar dataKey="load" fill="#000" radius={[2, 2, 0, 0]} name="Load" />
                               </ReBarChart>
                            </ResponsiveContainer>
                         </div>
@@ -295,7 +308,9 @@ const Dashboard = () => {
                     <h3 className="text-2xl font-[900] uppercase italic mb-3 truncate border-b-2 border-black pb-2">{repo.name}</h3>
                     <div className="flex flex-wrap gap-2 mb-4">
                        <div className="text-[9px] font-[900] uppercase bg-[#FFD600] px-2 py-0.5 border-2 border-black">{repo.language || 'DATA'}</div>
-                       <div className="text-[9px] font-[900] uppercase bg-black text-white px-2 py-0.5 border-2 border-black">{repo.visibility || 'PRIVATE'}</div>
+                       <div className={`text-[9px] font-[900] uppercase px-2 py-0.5 border-2 border-black ${repo.isPrivate ? 'bg-black text-white' : 'bg-white text-black'}`}>
+                         {repo.isPrivate ? 'PRIVATE_SIGNAL' : 'PUBLIC_SIGNAL'}
+                       </div>
                     </div>
                     <p className="text-xs font-bold opacity-70 leading-snug h-10 line-clamp-3">{repo.description || 'No metadata available for this command.'}</p>
                     <div className="mt-6 pt-4 border-t-2 border-dashed border-black flex justify-between items-center text-[9px] font-black uppercase italic opacity-40">
@@ -396,12 +411,12 @@ const SidebarItem = ({ icon, label, active = false, onClick }) => (
   </div>
 );
 
-const StatBox = ({ label, value, color, textColor = 'black', statusColor }) => (
-  <div style={{ backgroundColor: color, color: textColor }} className="p-6 border-[6px] border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] relative overflow-hidden group">
+const StatBox = ({ label, value, desc, color, textColor = 'black', statusColor }) => (
+  <div style={{ backgroundColor: color, color: textColor }} className="p-6 border-[6px] border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] relative overflow-hidden group hover:-translate-y-1 transition-transform">
     {statusColor && <div style={{ backgroundColor: statusColor }} className="absolute h-full w-2 left-0 top-0"></div>}
-    <div className="text-[10px] font-[900] uppercase opacity-40 italic mb-1.5 tracking-[0.1em]">{label}</div>
-    <div className="text-3xl font-[900] tracking-tighter uppercase italic leading-none">{value}</div>
-    <ArrowUpRight size={24} className="absolute bottom-2 right-2 opacity-10 group-hover:opacity-100 group-hover:translate-x-[-2px] group-hover:translate-y-[2px] transition-all" />
+    <div className="text-[10px] font-[900] uppercase opacity-40 italic mb-1 tracking-[0.1em]">{label}</div>
+    <div className="text-3xl font-[900] tracking-tighter uppercase italic leading-none mb-2">{value}</div>
+    <div className="text-[9px] font-bold opacity-60 leading-tight border-t border-black/10 pt-2">{desc}</div>
   </div>
 );
 

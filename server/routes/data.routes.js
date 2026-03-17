@@ -31,7 +31,13 @@ router.post('/sync', protect, catchAsync(async (req, res) => {
  */
 router.get('/stats', protect, catchAsync(async (req, res) => {
   const userId = req.user._id;
+  const totalCommitsCount = await Commit.countDocuments({ userId });
   
+  // Auto-trigger sync if new user or data empty
+  if (totalCommitsCount === 0 && req.user.syncStatus === 'idle') {
+    syncAllForUser(req.user).catch(() => {});
+  }
+
   // Advanced Aggregation for reflective stats
   const advancedStats = await Commit.aggregate([
     { $match: { userId } },
