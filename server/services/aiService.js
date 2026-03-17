@@ -25,15 +25,27 @@ export async function analyzeCommitSentiment(commitMessage) {
       model: 'llama-3.3-70b-versatile',
       messages: [
         { role: 'system', content: systemPrompt },
-        { role: 'user', content: commitMessage }
+        { role: 'user', content: commitMessage || 'EMPTY_SIGNAL' }
       ],
       response_format: { type: "json_object" },
-      max_tokens: 150,
+      max_tokens: 250,
     });
-    return JSON.parse(res.choices[0].message.content);
+    const parsed = JSON.parse(res.choices[0].message.content);
+    return {
+      score: parsed.score ?? 50,
+      burnout: parsed.burnout ?? 0,
+      vibe: parsed.vibe ?? 'Calibrated',
+      briefing: parsed.briefing ?? 'Signal parsed.',
+      recommendation: parsed.recommendation ?? 'Maintain operational tempo.'
+    };
   } catch (err) {
-    console.error('[AI] Groq Analysis failed:', err.message);
-    return { score: 50, burnout: 0, vibe: 'unknown', briefing: 'SIGNAL_LOST' };
+    return { 
+      score: 50, 
+      burnout: 0, 
+      vibe: 'Static', 
+      briefing: 'SIGNAL_DEGRADED', 
+      recommendation: 'Verify system connection and retry ingestion.' 
+    };
   }
 }
 

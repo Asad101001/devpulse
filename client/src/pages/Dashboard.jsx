@@ -103,7 +103,7 @@ const Dashboard = () => {
   const getBurnoutColor = (score) => score > 60 ? '#F87171' : score < 30 ? '#4ADE80' : '#FF6B00';
 
   return (
-    <div className="min-h-screen bg-white text-black font-['Outfit'] flex flex-col md:flex-row overflow-hidden">
+    <div className={`min-h-screen bg-white text-black font-['Outfit'] flex flex-col md:flex-row overflow-hidden ${config.density === 'S' ? 'text-sm' : config.density === 'L' ? 'text-lg' : 'text-base'}`}>
       {/* Sidebar */}
       <aside className="w-full md:w-60 bg-black text-white border-r-[6px] border-black flex flex-col sticky top-0 md:h-screen z-20">
         <div className="p-5 border-b-[6px] border-white flex items-center gap-3 bg-[#FF6B00]">
@@ -125,7 +125,7 @@ const Dashboard = () => {
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 bg-[#FFD600] border-l-[6px] border-black p-4 md:p-6 space-y-6 overflow-y-auto h-screen selection:bg-black selection:text-[#FFD600]">
+      <main className={`flex-1 bg-[#FFD600] border-l-[6px] border-black p-4 md:p-6 space-y-6 overflow-y-auto h-screen selection:bg-black selection:text-[#FFD600] ${config.density === 'S' ? 'gap-2' : config.density === 'L' ? 'gap-10' : 'gap-6'}`}>
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b-[6px] border-black pb-6">
           <div>
             <div className="inline-block bg-black text-white px-2 py-0.5 font-black uppercase tracking-widest text-[9px] mb-3">
@@ -264,21 +264,16 @@ const Dashboard = () => {
                   </div>
                 </div>
 
-                {/* 3D Cube Visualizer */}
-                <div className="bg-black p-8 border-[6px] border-black flex flex-col items-center justify-center gap-6 shadow-[10px_10px_0px_white]">
-                   <div className="cube-container scale-75">
-                      <div className="cube">
-                         <div className="cube-face front">⚡</div>
-                         <div className="cube-face back">⚡</div>
-                         <div className="cube-face right">P</div>
-                         <div className="cube-face left">D</div>
-                         <div className="cube-face top">V</div>
-                         <div className="cube-face bottom">S</div>
-                      </div>
+                {/* Operational Health Metrics */}
+                <div className="bg-black p-8 border-[6px] border-black flex flex-col gap-6 shadow-[10px_10px_0px_white]">
+                   <h3 className="text-[#FFD600] font-[900] uppercase italic border-b-2 border-[#FFD600]/20 pb-2">Operational Health Index</h3>
+                   <div className="space-y-4">
+                      <HealthBar label="Burnout Tolerance" value={100 - m.avgBurnout} color="#F87171" bg="#450a0a" />
+                      <HealthBar label="Signal Integrity" value={parseInt(m.signalStability)} color="#4ADE80" bg="#064e3b" />
+                      <HealthBar label="Cognitive Buffer" value={100 - parseInt(m.cognitiveLoad)} color="#FFD600" bg="#422006" />
                    </div>
-                   <div className="text-center">
-                      <div className="text-[#FFD600] font-black text-xs uppercase tracking-widest mb-1 italic">Signal Geometry</div>
-                      <div className="text-white text-[9px] font-bold opacity-40 uppercase">Real-time vector stabilization active</div>
+                   <div className="text-center pt-2">
+                      <div className="text-white text-[10px] font-bold opacity-40 uppercase tracking-widest">Aggregate Stability: {m.signalStability}</div>
                    </div>
                 </div>
 
@@ -303,9 +298,23 @@ const Dashboard = () => {
                 <div key={idx} className="bg-white border-[6px] border-black p-6 shadow-[8px_8px_0px_0px_#000] hover:translate-x-1 hover:translate-y-1 hover:shadow-none transition-all cursor-default group">
                     <div className="flex justify-between items-start mb-4">
                        <Github size={36} className="text-[#FF6B00] group-hover:rotate-12 transition-transform" />
-                       <ArrowUpRight size={20} className="opacity-20 group-hover:opacity-100" />
+                       <a href={`https://github.com/${user?.username}/${repo.name}`} target="_blank" rel="noopener noreferrer" className="p-2 bg-[#FFD600] border-2 border-black hover:bg-black hover:text-white transition-all shadow-[3px_3px_0px_0px_#000] hover:shadow-none">
+                          <ArrowUpRight size={20} />
+                       </a>
                     </div>
-                    <h3 className="text-2xl font-[900] uppercase italic mb-3 truncate border-b-2 border-black pb-2">{repo.name}</h3>
+                    <h3 className="text-2xl font-[900] uppercase italic mb-1 truncate border-b-2 border-black pb-1">{repo.name}</h3>
+                    <div className="text-[10px] font-black opacity-40 mb-3 italic">Last Active: {new Date(repo.lastActivity).toLocaleDateString()}</div>
+                    
+                    <div className="grid grid-cols-2 gap-2 mb-4">
+                       <div className="bg-black text-white p-2 border-2 border-black text-center">
+                          <div className="text-[8px] opacity-60">COMMITS</div>
+                          <div className="text-xl font-[900]">{repo.commitCount}</div>
+                       </div>
+                       <div className="bg-[#FF6B00] text-white p-2 border-2 border-black text-center">
+                          <div className="text-[8px] opacity-60">LOAD</div>
+                          <div className="text-xl font-[900]">{Math.min(Math.round(repo.commitCount / 5), 100)}%</div>
+                       </div>
+                    </div>
                     <div className="flex flex-wrap gap-2 mb-4">
                        <div className="text-[9px] font-[900] uppercase bg-[#FFD600] px-2 py-0.5 border-2 border-black">{repo.language || 'DATA'}</div>
                        <div className={`text-[9px] font-[900] uppercase px-2 py-0.5 border-2 border-black ${repo.isPrivate ? 'bg-black text-white' : 'bg-white text-black'}`}>
@@ -425,6 +434,21 @@ const WrappedBox = ({ label, value, sub, color, bg = 'white' }) => (
     <div className="text-[11px] font-[1000] uppercase text-black/40 tracking-widest mb-2 whitespace-nowrap">{label}</div>
     <div className="text-4xl font-[1000] italic uppercase tracking-tighter mb-2" style={{ color: color }}>{value}</div>
     <div className="text-[10px] font-[1000] uppercase opacity-20 group-hover:opacity-100 transition-opacity">{sub}</div>
+  </div>
+);
+
+const HealthBar = ({ label, value, color, bg }) => (
+  <div className="space-y-1.5">
+    <div className="flex justify-between text-[10px] font-black uppercase text-white/60 italic">
+      <span>{label}</span>
+      <span>{Math.round(value)}%</span>
+    </div>
+    <div className="h-4 w-full border-2 border-white/20 p-[2px]" style={{ backgroundColor: bg }}>
+      <div 
+        className="h-full transition-all duration-1000" 
+        style={{ width: `${Math.max(0, Math.min(100, value))}%`, backgroundColor: color }}
+      ></div>
+    </div>
   </div>
 );
 

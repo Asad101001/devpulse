@@ -149,7 +149,19 @@ router.get('/stats', protect, catchAsync(async (req, res) => {
   const fullDays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
   
   const repoCount = await Repo.countDocuments({ userId });
-  const repoList = await Repo.find({ userId }).sort({ name: 1 });
+  
+  // Fetch repos with commit counts
+  const repoListRaw = await Repo.find({ userId }).sort({ name: 1 }).lean();
+  const repoList = await Promise.all(repoListRaw.map(async (repo) => {
+    const count = await Commit.countDocuments({ repoId: repo._id });
+    const lastCommit = await Commit.findOne({ repoId: repo._id }).sort({ timestamp: -1 });
+    return {
+      ...repo,
+      commitCount: count,
+      lastActivity: lastCommit ? lastCommit.timestamp : repo.updatedAt
+    };
+  }));
+
   const recentCommits = await Commit.find({ userId })
     .sort({ timestamp: -1 })
     .limit(5)
