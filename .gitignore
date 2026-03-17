@@ -27,3 +27,11 @@ Thumbs.db
 # Database/Temp
 tmp/
 server/data/
+
+# AI Context & Work Logs
+.claude/
+SYSTEM_CONTEXT.md
+WORK_LOG.md
+.agent/
+.gemini/
+.agents/

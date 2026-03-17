@@ -1,63 +1,80 @@
-# DevPulse — INDUSTRIAL_DEVELOPER_TELEMETRY
+# DEVPULSE // INDUSTRIAL_SIGNAL_ANALYSIS
 
-![DevPulse Banner](https://via.placeholder.com/1200x400/000000/FF6B00?text=DEVPULSE+_+INDUSTRIAL_ENGINEERING)
+> **"ALL_SIGNAL. ZERO_FLUFF. SYSTEM_STABILIZED."**
 
-> **"CODE_BRUTALIST. MINIMIZE_FRICTION. SYSTEM_STABILIZED."**
+DevPulse is a high-fidelity engineer resonance platform. It converts raw commit narratives into actionable cognitive load telemetry using **Groq-powered Llama 3.3** inference. Designed for high-intensity developers who operate on direct-to-metal principles.
 
-DevPulse is a high-intensity, AI-powered telemetry dashboard for deep-cycle engineering analysis. It integrates with your GitHub ecosystem to parse commit narratives, detect cognitive load, and mitigate burnout through Groq Llama 3.3 inference.
+---
 
-## ⚡ CORE_SIGNALS
+## ⚡ CORE_SYSTEM_CAPABILITIES
 
-- **COGNITIVE_FEED**: Real-time LLM parsing of engineering narrative (commits) to detect fatigue and system friction.
-- **SIGNAL_STABILITY**: High-fidelity metrics tracking consistent output vs. chaotic bursts.
-- **BURNOUT_MATRIX**: Predictive analysis of engineering pulse based on late-night activity and complexity spikes.
-- **BRUTALIST_UI**: A stark, high-contrast command center built for industrial-grade focus.
+- **COG_LOAD_MATRIX**: Real-time parsing of commit complexity, code churn (additions/deletions), and files changed.
+- **NEURAL_SENTIMENT**: High-speed LLM inference (llama-3.3-70b) to detect frustration, agility, and burnout risk.
+- **INDUSTRIAL_DASHBOARD**: A stark, brutalist command center built with Recharts for visual precision and ZERO data persistence.
+- **WRAPPED_REPORTING**: Automated extraction of peak activity signals and executive engineering directives.
 
-## 🛠 TECH_STACK
+## 🏗 SYSTEM_ARCHITECTURE
 
-- **FRONTEND**: React 18, Vite, Tailwind (Industrial Brutalist Index), Lucide, Recharts.
-- **BACKEND**: Node.js, Express, Passport.js (GitHub OAuth Matrix).
-- **DATABASE**: MongoDB Atlas (Cloud Persistence).
-- **AI_ENGINE**: Groq SDK (Llama 3.3 70B Versatile).
-- **TELEMETRY**: Octokit (GitHub REST API Interface).
+```mermaid
+graph TD
+    Client[Vite/React Dashboard] -->|JWT Auth| API[Express 5 Server]
+    API -->|OAuth| GitHub[GitHub API / Octokit]
+    API -->|Inference| Groq[Groq Llama 3.3]
+    API -->|Persistence| Mongo[MongoDB Atlas]
+    Groq -->|JSON Signal| API
+    GitHub -->|Commit Stream| API
+```
 
 ## 🚀 BOOT_PROTOCOLS
 
-### REQUIREMENTS
-- Node.js v25+
-- MongoDB Atlas Instance
-- GitHub OAuth Application Credentials
-- Groq Cloud API Key
+### 1. Requirements
+- **Node.js**: v20+ (v25 recommended)
+- **Database**: MongoDB instance (Atlas clusters supported)
+- **API Keys**: GitHub OAuth App Creds + Groq Cloud API Key
 
-### ENVIRONMENT_CONFIG
-Create a `.env` in the `server` directory (and root for deployment):
+### 2. Environment (server/.env)
 ```env
 PORT=5000
-MONGO_URI=your_mongodb_uri
-SESSION_SECRET=your_system_secret
-JWT_SECRET=your_auth_secret
-GITHUB_CLIENT_ID=your_id
-GITHUB_CLIENT_SECRET=your_secret
-GITHUB_CALLBACK_URL=https://your-domain.com/api/v1/auth/github/callback
-CLIENT_URL=https://your-domain.com
-GROQ_API_KEY=your_groq_key
+NODE_ENV=development
+MONGO_URI=mongodb+srv://...
+SESSION_SECRET=...
+JWT_SECRET=...
+GITHUB_CLIENT_ID=...
+GITHUB_CLIENT_SECRET=...
+GITHUB_CALLBACK_URL=http://localhost:5000/api/v1/auth/github/callback
+CLIENT_URL=http://localhost:5173
+GROQ_API_KEY=...
 ```
 
-### SYSTEM_INITIALIZATION
+### 3. Execution
 ```bash
-# 1. Install Matrices
+# 1. Install dependencies
 npm run install:all
 
-# 2. Operational Start (Development)
+# 2. Start combined dev environment
 npm run dev
+# [Port 5000]: API Server
+# [Port 5173]: Frontend Client
 ```
 
+## 🛠 DEPLOYMENT_INDEX
+
+### Rendering (Backend)
+- Use **Render** or **Railway**. 
+- Environment: Set `NODE_ENV` to `production`.
+- Build Command: `npm install`.
+- Start Command: `npm start`.
+
+### Vercel (Frontend)
+- Build Command: `npm run build`.
+- Output Directory: `dist`.
+- Framework Preset: `Vite`.
+
 ## 📐 DESIGN_PHILOSOPHY
-DevPulse adheres to the **Industrial Brutalist Design Index**:
 - **STARK_CONTRAST**: #FF6B00 (Orange), #FFD600 (Yellow), #000000 (Black).
-- **HARD_EDGES**: Thick 6px solid borders.
-- **HEAVY_SHADOWS**: Non-blurred 8px offsets (Industrial Shadows).
-- **INTENSE_TYPE**: Outfit Black (Italicized for urgency).
+- **HEAVY_EDGES**: Uniform 6px+ solid black borders.
+- **BRUTALIST_TYPE**: Outfit Black (Italicized for urgency).
+- **NO_GRADIENTS**: Solid color blocking for maximum cognitive focus.
 
 ---
-© 2026 DEVPULSE PLATFORM. ZERO_TRACKERS. ZERO_FLUFF. ALL_SIGNAL.
+© 2026 DEVPULSE PLATFORM // AUTHORIZED_SIGNAL_ONLY // [devpulse.io](https://devpulse.io)

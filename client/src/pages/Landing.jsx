@@ -3,12 +3,17 @@ import { useNavigate } from 'react-router-dom';
 import { Github, ArrowRight, Zap, Shield, Cpu, BarChart3, Activity, Command } from 'lucide-react';
 
 const Landing = () => {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, loading } = useAuth();
   const navigate = useNavigate();
+
+  React.useEffect(() => {
+    if (isAuthenticated && !loading) {
+      navigate('/dashboard', { replace: true });
+    }
+  }, [isAuthenticated, loading, navigate]);
 
   const onLogin = () => {
     const apiBase = import.meta.env.VITE_API_URL || 'http://localhost:5000';
-    console.log('[Auth] Initiating GitHub OAuth redirect to:', `${apiBase}/api/v1/auth/github`);
     window.location.href = `${apiBase}/api/v1/auth/github`;
   };
 
@@ -62,7 +67,7 @@ const Landing = () => {
             className="group self-start bg-black text-[#FFD600] px-8 py-5 text-2xl font-[900] uppercase italic border-4 border-black flex items-center gap-4 shadow-[12px_12px_0px_0px_#FF6B00] hover:shadow-none hover:translate-x-4 hover:translate-y-4 transition-all"
           >
             <BarChart3 size={32} strokeWidth={3} />
-            View Stats
+            Launch Intelligence
             <ArrowRight size={32} className="group-hover:translate-x-4 transition-transform" />
           </button>
         </div>

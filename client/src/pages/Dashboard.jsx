@@ -208,7 +208,13 @@ const Dashboard = () => {
         </nav>
 
         <div className="p-5 border-t-[6px] border-white space-y-3">
-          <button onClick={logout} className="w-full bg-white text-black p-2.5 border-4 border-black font-[900] uppercase text-sm flex items-center justify-center gap-2 hover:bg-[#F87171] transition-all shadow-[4px_4px_0px_0px_#FFD600]">
+          <button 
+            onClick={() => {
+              logout();
+              navigate('/', { replace: true });
+            }} 
+            className="w-full bg-white text-black p-2.5 border-4 border-black font-[900] uppercase text-sm flex items-center justify-center gap-2 hover:bg-[#F87171] transition-all shadow-[4px_4px_0px_0px_#FFD600]"
+          >
             <LogOut size={16} /> End Session
           </button>
         </div>
@@ -241,92 +247,104 @@ const Dashboard = () => {
               <StatBox label="Linguistic Prec" value={m.linguisticPrecision} desc="Technical detail in documentation." color="white" />
               <StatBox label="Active Signals" value={m.totalCommits} desc="Total data points ingested." color="black" textColor="white" />
             </div>
-
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
               <div className="lg:col-span-8 flex flex-col gap-6">
-                <div className="bg-white border-[6px] border-black p-6 shadow-[10px_10px_0px_0px_#000]">
-                  <h2 className="text-2xl font-[900] uppercase italic tracking-tighter mb-6 border-b-4 border-black pb-3 flex items-center gap-3">
-                    <Cpu className="text-[#FF6B00]" size={28} />
-                    AI Insights & Signals
-                  </h2>
-                  <div className="space-y-3">
-                    {stats.recentCommits?.map((commit, idx) => (
-                      <div key={idx} className="p-3.5 border-4 border-black bg-white group hover:bg-black hover:text-white transition-all cursor-default relative overflow-hidden">
-                         <div className="flex justify-between items-start mb-1.5">
-                            <span className="text-[9px] font-black uppercase bg-[#FFD600] text-black px-1.5 py-0.5 border-2 border-black inline-block">{commit.repoId?.name}</span>
-                            <span className="text-[9px] font-bold opacity-40 group-hover:opacity-100">{new Date(commit.timestamp).toLocaleDateString()}</span>
-                         </div>
-                         <div className="text-lg font-[900] uppercase italic tracking-tight mb-2">"{commit.message}"</div>
-                         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                            <div className="p-3 bg-[#FFD600]/10 border-l-4 border-[#FF6B00] text-[11px] font-bold leading-snug group-hover:bg-[#FF6B00]/20">
-                               <span className="text-[#FF6B00] group-hover:text-[#FFD600] uppercase block mb-1">System Brief:</span> {commit.aiSummary || 'Analysis pending...'}
-                            </div>
-                            <div className="p-3 bg-black/5 border-l-4 border-black text-[11px] font-bold leading-snug group-hover:bg-white/10">
-                               <span className="text-black group-hover:text-white uppercase block mb-1">Recommendation:</span> {commit.aiRecommendation || 'Awaiting signal processing...'}
-                            </div>
-                         </div>
-                      </div>
-                    ))}
+                {m.totalCommits === 0 && !isSyncing ? (
+                  <div className="bg-black text-[#FFD600] p-12 border-[8px] border-black shadow-[20px_20px_0px_#FF6B00] flex flex-col items-center justify-center text-center animate-in zoom-in duration-300">
+                    <Activity size={80} className="mb-6 animate-pulse" />
+                    <h2 className="text-4xl font-[1000] uppercase italic tracking-tighter mb-4">NO_SIGNAL_DETECTED</h2>
+                    <p className="max-w-md font-bold opacity-60 uppercase italic mb-8">System is in standby. Ingest GitHub telemetry to populate the intelligence matrix.</p>
+                    <button onClick={handleSync} className="bg-[#FF6B00] text-white px-10 py-5 text-2xl font-[900] uppercase italic border-4 border-black shadow-[8px_8px_0px_#000] hover:shadow-none hover:translate-x-2 hover:translate-y-2 transition-all">
+                      Initial Signal Ingest
+                    </button>
                   </div>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="bg-white border-[6px] border-black p-5 shadow-[8px_8px_0px_0px_#000]">
-                        <h3 className="text-lg font-[900] uppercase italic mb-4 border-b-2 border-black pb-2 flex items-center gap-2">
-                           <BarChart size={18} className="text-[#FF6B00]" /> Signal Intensity Matrix
-                        </h3>
-                        <div className="h-[240px] w-full">
-                           <ResponsiveContainer width="100%" height="100%">
-                              <ReBarChart data={stats.chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                                 <CartesianGrid strokeDasharray="3 3" stroke="#eee" vertical={false} />
-                                 <XAxis dataKey="name" axisLine={{ strokeWidth: 4 }} tickLine={false} tick={{ fontSize: 10, fontWeight: 900 }} />
-                                 <YAxis domain={[0, 100]} axisLine={{ strokeWidth: 4 }} tick={{ fontSize: 10, fontWeight: 900 }} />
-                                 <Tooltip 
-                                    cursor={{ fill: 'rgba(0,0,0,0.05)' }}
-                                    content={({ active, payload }) => {
-                                      if (active && payload && payload.length) {
-                                        return (
-                                          <div className="bg-black text-white p-3 border-2 border-[#FF6B00] font-black uppercase text-[10px] italic">
-                                            <p>{`Sentiment: ${payload[0].value}%`}</p>
-                                            <p>{`Load: ${payload[1].value}%`}</p>
-                                          </div>
-                                        );
-                                      }
-                                      return null;
-                                    }}
-                                 />
-                                 <Bar dataKey="score" fill="#FF6B00" radius={[2, 2, 0, 0]} name="Sentiment" />
-                                 <Bar dataKey="load" fill="#000" radius={[2, 2, 0, 0]} name="Load" />
-                              </ReBarChart>
-                           </ResponsiveContainer>
-                        </div>
-                        <div className="flex justify-center gap-4 mt-2 text-[9px] font-black uppercase italic">
-                           <div className="flex items-center gap-1"><span className="w-2 h-2 bg-[#FF6B00]"></span> Sentiment</div>
-                           <div className="flex items-center gap-1"><span className="w-2 h-2 bg-black"></span> Load</div>
-                        </div>
+                ) : (
+                  <>
+                    <div className="bg-white border-[6px] border-black p-6 shadow-[10px_10px_0px_0px_#000]">
+                      <h2 className="text-2xl font-[900] uppercase italic tracking-tighter mb-6 border-b-4 border-black pb-3 flex items-center gap-3">
+                        <Cpu className="text-[#FF6B00]" size={28} />
+                        AI Insights & Signals
+                      </h2>
+                      <div className="space-y-3">
+                        {stats.recentCommits?.map((commit, idx) => (
+                          <div key={idx} className="p-3.5 border-4 border-black bg-white group hover:bg-black hover:text-white transition-all cursor-default relative overflow-hidden">
+                             <div className="flex justify-between items-start mb-1.5">
+                                <span className="text-[9px] font-black uppercase bg-[#FFD600] text-black px-1.5 py-0.5 border-2 border-black inline-block">{commit.repoId?.name}</span>
+                                <span className="text-[9px] font-bold opacity-40 group-hover:opacity-100">{new Date(commit.timestamp).toLocaleDateString()}</span>
+                             </div>
+                             <div className="text-lg font-[900] uppercase italic tracking-tight mb-2">"{commit.message}"</div>
+                             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                <div className="p-3 bg-[#FFD600]/10 border-l-4 border-[#FF6B00] text-[11px] font-bold leading-snug group-hover:bg-[#FF6B00]/20">
+                                   <span className="text-[#FF6B00] group-hover:text-[#FFD600] uppercase block mb-1">System Brief:</span> {commit.aiSummary || 'Analysis pending...'}
+                                </div>
+                                <div className="p-3 bg-black/5 border-l-4 border-black text-[11px] font-bold leading-snug group-hover:bg-white/10">
+                                   <span className="text-black group-hover:text-white uppercase block mb-1">Recommendation:</span> {commit.aiRecommendation || 'Awaiting signal processing...'}
+                                </div>
+                             </div>
+                          </div>
+                        ))}
+                      </div>
                     </div>
 
-                    <div className="bg-white border-[6px] border-black p-5 shadow-[8px_8px_0px_0px_#000]">
-                        <h3 className="text-lg font-[900] uppercase italic mb-4 border-b-2 border-black pb-2 flex items-center gap-2">
-                           <Activity size={18} className="text-[#FF6B00]" /> Operational Radar
-                        </h3>
-                        <div className="h-[240px] w-full">
-                           <ResponsiveContainer width="100%" height="100%">
-                              <RadarChart cx="50%" cy="50%" outerRadius="70%" data={[
-                                 { subject: 'Intensity', A: m.avgSentiment, fullMark: 100 },
-                                 { subject: 'Stability', A: parseInt(m.signalStability), fullMark: 100 },
-                                 { subject: 'Cognitive', A: parseInt(m.cognitiveLoad), fullMark: 100 },
-                                 { subject: 'Volume', A: Math.min(m.totalCommits * 2, 100), fullMark: 100 },
-                                 { subject: 'Precision', A: Math.min(parseInt(m.linguisticPrecision) * 5, 100), fullMark: 100 },
-                              ]}>
-                                 <PolarGrid stroke="#000" strokeWidth={1} />
-                                 <PolarAngleAxis dataKey="subject" tick={{ fill: '#000', fontSize: 9, fontWeight: '900' }} />
-                                 <Radar name="Metrics" dataKey="A" stroke="#000" strokeWidth={3} fill="#FF6B00" fillOpacity={0.8} />
-                              </RadarChart>
-                           </ResponsiveContainer>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div className="bg-white border-[6px] border-black p-5 shadow-[8px_8px_0px_0px_#000]">
+                            <h3 className="text-lg font-[900] uppercase italic mb-4 border-b-2 border-black pb-2 flex items-center gap-2">
+                               <BarChart size={18} className="text-[#FF6B00]" /> Signal Intensity Matrix
+                            </h3>
+                            <div className="h-[240px] w-full">
+                               <ResponsiveContainer width="100%" height="100%">
+                                  <ReBarChart data={stats.chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                                     <CartesianGrid strokeDasharray="3 3" stroke="#eee" vertical={false} />
+                                     <XAxis dataKey="name" axisLine={{ strokeWidth: 4 }} tickLine={false} tick={{ fontSize: 10, fontWeight: 900 }} />
+                                     <YAxis domain={[0, 100]} axisLine={{ strokeWidth: 4 }} tick={{ fontSize: 10, fontWeight: 900 }} />
+                                     <Tooltip 
+                                        cursor={{ fill: 'rgba(0,0,0,0.05)' }}
+                                        content={({ active, payload }) => {
+                                          if (active && payload && payload.length) {
+                                            return (
+                                              <div className="bg-black text-white p-3 border-2 border-[#FF6B00] font-black uppercase text-[10px] italic">
+                                                <p>{`Sentiment: ${payload[0].value}%`}</p>
+                                                <p>{`Load: ${payload[1].value}%`}</p>
+                                              </div>
+                                            );
+                                          }
+                                          return null;
+                                        }}
+                                     />
+                                     <Bar dataKey="score" fill="#FF6B00" radius={[2, 2, 0, 0]} name="Sentiment" />
+                                     <Bar dataKey="load" fill="#000" radius={[2, 2, 0, 0]} name="Load" />
+                                  </ReBarChart>
+                               </ResponsiveContainer>
+                            </div>
+                            <div className="flex justify-center gap-4 mt-2 text-[9px] font-black uppercase italic">
+                               <div className="flex items-center gap-1"><span className="w-2 h-2 bg-[#FF6B00]"></span> Sentiment</div>
+                               <div className="flex items-center gap-1"><span className="w-2 h-2 bg-black"></span> Load</div>
+                            </div>
+                        </div>
+
+                        <div className="bg-white border-[6px] border-black p-5 shadow-[8px_8px_0px_0px_#000]">
+                            <h3 className="text-lg font-[900] uppercase italic mb-4 border-b-2 border-black pb-2 flex items-center gap-2">
+                               <Activity size={18} className="text-[#FF6B00]" /> Operational Radar
+                            </h3>
+                            <div className="h-[240px] w-full">
+                               <ResponsiveContainer width="100%" height="100%">
+                                  <RadarChart cx="50%" cy="50%" outerRadius="70%" data={[
+                                     { subject: 'Intensity', A: m.avgSentiment, fullMark: 100 },
+                                     { subject: 'Stability', A: parseInt(m.signalStability), fullMark: 100 },
+                                     { subject: 'Cognitive', A: parseInt(m.cognitiveLoad), fullMark: 100 },
+                                     { subject: 'Volume', A: Math.min(m.totalCommits * 2, 100), fullMark: 100 },
+                                     { subject: 'Precision', A: Math.min(parseInt(m.linguisticPrecision) * 5, 100), fullMark: 100 },
+                                  ]}>
+                                     <PolarGrid stroke="#000" strokeWidth={1} />
+                                     <PolarAngleAxis dataKey="subject" tick={{ fill: '#000', fontSize: 9, fontWeight: '900' }} />
+                                     <Radar name="Metrics" dataKey="A" stroke="#000" strokeWidth={3} fill="#FF6B00" fillOpacity={0.8} />
+                                  </RadarChart>
+                               </ResponsiveContainer>
+                            </div>
                         </div>
                     </div>
-                </div>
+                  </>
+                )}
               </div>
 
               <div className="lg:col-span-4 space-y-6">
@@ -579,7 +597,11 @@ const Dashboard = () => {
                  <div className="pt-6 border-t-4 border-black space-y-4">
                     <button 
                       onClick={() => {
-                        notify('CONFIG_SYNCED: Operational parameters updated.', 'success');
+                        notify('TRANSMITTING_SYSTEM_PARAMETERS...', 'info');
+                        setTimeout(() => {
+                           localStorage.setItem('devpulse_config', JSON.stringify(config));
+                           notify('CONFIG_SYNCED_AND_HARDENED.', 'success');
+                        }, 800);
                       }}
                       className="w-full bg-black text-[#FFD600] py-4 text-xl font-[900] uppercase italic border-4 border-black hover:bg-[#FF6B00] hover:text-white transition-all mb-4"
                     >
