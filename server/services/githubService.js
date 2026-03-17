@@ -79,10 +79,10 @@ export const syncRepoCommits = async (user, repo) => {
   const newCommits = [];
 
   for (const commitData of commits) {
-    // Optimization: Check if commit already analyzed
+    // Optimization: Check if commit already fully analyzed with telemetry
     const existingCommit = await Commit.findOne({ sha: commitData.sha });
     
-    if (existingCommit && existingCommit.sentimentScore !== undefined) {
+    if (existingCommit && existingCommit.aiRecommendation && existingCommit.additions > 0) {
       newCommits.push(existingCommit);
       continue;
     }
@@ -93,7 +93,25 @@ export const syncRepoCommits = async (user, repo) => {
 
     // AI Analysis only for new or unanalyzed signals
     const aiAnalysis = await analyzeCommitSentiment(commitData.commit.message);
-    await sleep(250); // Reduced delay for faster throughput
+    
+    // Fetch detailed stats (additions/deletions) for richer telemetry
+    let stats = { additions: 0, deletions: 0, filesChanged: 0 };
+    try {
+      const { data: detail } = await octokit.rest.repos.getCommit({
+        owner,
+        repo: repoName,
+        ref: commitData.sha
+      });
+      stats = {
+        additions: detail.stats.additions,
+        deletions: detail.stats.deletions,
+        filesChanged: detail.files.length
+      };
+    } catch (e) {
+      // Fallback to defaults if detail fetch fails
+    }
+
+    await sleep(100); 
 
     const commit = await Commit.findOneAndUpdate(
       { sha: commitData.sha },
@@ -109,6 +127,9 @@ export const syncRepoCommits = async (user, repo) => {
         moodTag: aiAnalysis.vibe,
         aiSummary: aiAnalysis.briefing,
         aiRecommendation: aiAnalysis.recommendation,
+        additions: stats.additions,
+        deletions: stats.deletions,
+        filesChanged: stats.filesChanged,
       },
       { upsert: true, new: true }
     );
@@ -137,7 +158,13 @@ export const syncAllForUser = async (userInput) => {
         throw new Error('User not found or GitHub token missing');
     }
 
-    console.log(`[Sync] Starting sync for user: ${user.username}`);
+    // Prevent duplicate syncs if already running (stale check: 15 mins)
+    if (user.syncStatus === 'syncing' && user.updatedAt > new Date(Date.now() - 15 * 60 * 1000)) {
+        console.log(`[Sync] Sync already in progress for ${user.username}. Skipping.`);
+        return { success: true, message: 'Sync already in progress' };
+    }
+
+    console.log(`[Sync] Starting deep signal ingestion for user: ${user.username}`);
 
     // 1. Update user sync status
     await User.findByIdAndUpdate(user._id, { syncStatus: 'syncing' });
@@ -145,10 +172,8 @@ export const syncAllForUser = async (userInput) => {
     // 2. Fetch and sync repos
     const repos = await syncUserRepos(user);
 
-    // 3. Sync commits for each repo
-    for (const repo of repos) {
-      await syncRepoCommits(user, repo);
-    }
+    // 3. Sync commits for each repo in parallel
+    await Promise.all(repos.map(repo => syncRepoCommits(user, repo)));
 
     // 4. Update user sync status and lastSyncedAt
     await User.findByIdAndUpdate(user._id, { 

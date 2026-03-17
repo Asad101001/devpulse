@@ -39,6 +39,7 @@ export async function analyzeCommitSentiment(commitMessage) {
       recommendation: parsed.recommendation ?? 'Maintain operational tempo.'
     };
   } catch (err) {
+    console.error('[AI] Signal Processing FAILED:', err.message);
     return { 
       score: 50, 
       burnout: 0, 

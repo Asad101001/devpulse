@@ -167,6 +167,23 @@ router.get('/stats', protect, catchAsync(async (req, res) => {
     .limit(5)
     .populate('repoId', 'name');
 
+  // 5. Generate Aggregated Directive (The Wellness Directive)
+  const recentMessages = stats.messages.slice(0, 15).join('; ');
+  let executiveDirective = "Maintain high-fidelity output. Monitor cognitive friction.";
+  
+  if (stats.totalCommits > 0) {
+    // We could call Groq here for a single summary, but for now we'll derive from metrics
+    if (stats.avgBurnout > 60) {
+        executiveDirective = "CRITICAL: High burnout pulse detected. Immediate system cooling required. Halt all non-essential commits.";
+    } else if (cognitiveLoad > 70) {
+        executiveDirective = "WARNING: Heavy cognitive load. Engineering efficiency is degrading. Prioritize code stabilization over new features.";
+    } else if (stats.avgSentiment < 40) {
+        executiveDirective = "SIGNAL_FRICTION: Tone indicates frustration. Perform system reset and isolate root causes of friction.";
+    } else {
+        executiveDirective = "OPTIMAL: Engineering rhythm is stable. Continue high-intensity cycles with standard maintenance.";
+    }
+  }
+
   res.status(200).json({
     success: true,
     data: {
@@ -182,10 +199,15 @@ router.get('/stats', protect, catchAsync(async (req, res) => {
         lateNightCommits: lateNight,
         cognitiveLoad: `${cognitiveLoad}%`,
         signalStability: `${signalStability}%`,
-        linguisticPrecision: `${linguisticPrecision} wpc`
+        linguisticPrecision: `${linguisticPrecision} wpc`,
+        executiveDirective
       },
       repoList: repoList || [],
-      recentCommits,
+      recentCommits: recentCommits.map(c => ({
+        ...c.toObject(),
+        aiSummary: c.aiSummary || 'Signal parsed.',
+        aiRecommendation: c.aiRecommendation || 'Maintain tempo.'
+      })),
       heatmapData,
       chartData: formattedChart.length ? formattedChart : [
         { name: 'M', score: 50, load: 20 }, { name: 'T', score: 50, load: 20 }, { name: 'W', score: 50, load: 20 }
@@ -193,6 +215,30 @@ router.get('/stats', protect, catchAsync(async (req, res) => {
       syncStatus: req.user.syncStatus,
       lastSyncedAt: req.user.lastSyncedAt || new Date()
     },
+  });
+}));
+
+/**
+ * @route   POST /api/v1/data/reset
+ * @desc    Factory Reset: Wipe all user repositories and commits
+ * @access  Private
+ */
+router.post('/reset', protect, catchAsync(async (req, res) => {
+  const userId = req.user._id;
+
+  // Wipe data matrices
+  await Commit.deleteMany({ userId });
+  await Repo.deleteMany({ userId });
+
+  // Reset user sync state
+  await User.findByIdAndUpdate(userId, { 
+    syncStatus: 'idle', 
+    lastSyncedAt: null 
+  });
+
+  res.status(200).json({
+    success: true,
+    message: 'SYSTEM_WIPED: All telemetry data has been purged.',
   });
 }));
 

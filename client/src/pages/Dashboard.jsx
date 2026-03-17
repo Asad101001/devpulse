@@ -2,6 +2,7 @@ import React, { useRef } from 'react';
 import { useAuth } from '../context/AuthContext.jsx';
 import { useNavigate, Navigate } from 'react-router-dom';
 import api from '../services/api.js';
+// html-to-image is loaded via CDN in index.html for maximum stability
 import { 
   LogOut, 
   Activity, 
@@ -47,6 +48,15 @@ const Dashboard = () => {
     precision: 'standard',
     density: 'M'
   });
+  const [notification, setNotification] = React.useState(null);
+  const [overrideModal, setOverrideModal] = React.useState(null);
+  const posterRef = useRef(null);
+  const reportRef = useRef(null);
+
+  const notify = (msg, type = 'info') => {
+    setNotification({ msg, type });
+    setTimeout(() => setNotification(null), 3000);
+  };
 
   const fetchStats = async () => {
     try {
@@ -78,10 +88,58 @@ const Dashboard = () => {
     }
   };
 
-  const handleReset = () => {
-    if (window.confirm('FATAL: This will wipe all local intelligence data and reset the sync matrix. Proceed?')) {
-      alert('SIGNAL_WIPED. Reloading system...');
-      window.location.reload();
+  const handleReset = async () => {
+    setOverrideModal({
+      title: 'FACTORY_RESET_PURGE',
+      message: 'FATAL: This will wipe all local intelligence data and reset the sync matrix. All local cognitive history will be lost. Proceed?',
+      onConfirm: async () => {
+        try {
+          await api.post('/data/reset');
+          notify('SIGNAL_WIPED. Reloading system...', 'success');
+          setTimeout(() => window.location.reload(), 1500);
+        } catch (err) {
+          notify('PURGE_FAILED: System logic error.', 'error');
+        }
+        setOverrideModal(null);
+      }
+    });
+  };
+
+  const downloadReport = async () => {
+    if (reportRef.current === null) return;
+    notify('COMPILING_INTELLIGENCE_REPORT...', 'info');
+    try {
+      const dataUrl = await window.htmlToImage.toPng(reportRef.current, { 
+        cacheBust: true,
+        backgroundColor: '#000',
+        pixelRatio: 3
+      });
+      const link = document.createElement('a');
+      link.download = `devpulse-report-${user?.username || 'signal'}.png`;
+      link.href = dataUrl;
+      link.click();
+      notify('REPORT_EXTRACTED_SUCCESSFULLY', 'success');
+    } catch (err) {
+      notify('REPORT_EXTRACTION_FAILED_OVERLOAD', 'error');
+    }
+  };
+
+  const downloadPoster = async () => {
+    if (posterRef.current === null) return;
+    notify('GENERATING_SIGNAL_IMAGE...', 'info');
+    try {
+      const dataUrl = await window.htmlToImage.toPng(posterRef.current, { 
+        cacheBust: true,
+        backgroundColor: '#000',
+        pixelRatio: 2
+      });
+      const link = document.createElement('a');
+      link.download = `devpulse-wrapped-${user?.username || 'signal'}.png`;
+      link.href = dataUrl;
+      link.click();
+      notify('IMAGE_EXTRACTED_SUCCESSFULLY', 'success');
+    } catch (err) {
+      notify('EXTRACTION_FAILED_UNSTABLE_RENDER', 'error');
     }
   };
 
@@ -104,6 +162,40 @@ const Dashboard = () => {
 
   return (
     <div className={`min-h-screen bg-white text-black font-['Outfit'] flex flex-col md:flex-row overflow-hidden ${config.density === 'S' ? 'text-sm' : config.density === 'L' ? 'text-lg' : 'text-base'}`}>
+      {/* Notification Matrix */}
+      {notification && (
+        <div className={`fixed top-6 right-6 z-[120] p-4 border-[4px] border-black shadow-[6px_6px_0px_#000] font-black uppercase italic animate-in slide-in-from-right duration-300 ${
+          notification.type === 'error' ? 'bg-red-500 text-white' : 
+          notification.type === 'success' ? 'bg-[#4ADE80] text-black' : 'bg-[#FFD600] text-black'
+        }`}>
+          {notification.msg}
+        </div>
+      )}
+      {/* Override Modal matrix */}
+      {overrideModal && (
+        <div className="fixed inset-0 z-[110] bg-black/90 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-white border-[8px] border-black max-w-md w-full p-8 shadow-[20px_20px_0px_#F87171] animate-in zoom-in duration-200">
+            <h2 className="text-3xl font-[1000] text-black uppercase italic mb-4 border-b-4 border-black pb-2 flex items-center gap-3">
+              <Shield size={32} className="text-red-500" /> {overrideModal.title}
+            </h2>
+            <p className="text-sm font-bold uppercase mb-8 leading-tight italic">{overrideModal.message}</p>
+            <div className="flex gap-4">
+              <button 
+                onClick={overrideModal.onConfirm}
+                className="flex-1 bg-black text-white py-4 font-black uppercase italic border-4 border-black hover:bg-red-500 transition-all"
+              >
+                PROCEED_PURGE
+              </button>
+              <button 
+                onClick={() => setOverrideModal(null)}
+                className="flex-1 bg-white text-black py-4 font-black uppercase italic border-4 border-black hover:bg-gray-100 transition-all"
+              >
+                ABORT_SIGNAL
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
       {/* Sidebar */}
       <aside className="w-full md:w-60 bg-black text-white border-r-[6px] border-black flex flex-col sticky top-0 md:h-screen z-20">
         <div className="p-5 border-b-[6px] border-white flex items-center gap-3 bg-[#FF6B00]">
@@ -114,6 +206,7 @@ const Dashboard = () => {
         <nav className="flex-1 p-3 space-y-2">
           <SidebarItem icon={<LayoutDashboard size={18}/>} label="Operational Feed" active={activeTab === 'summary'} onClick={() => setActiveTab('summary')} />
           <SidebarItem icon={<Github size={18}/>} label="Repository Stats" active={activeTab === 'repos'} onClick={() => setActiveTab('repos')} />
+          <SidebarItem icon={<ImageIcon size={18}/>} label="Wrapped Signal" active={activeTab === 'wrapped'} onClick={() => setActiveTab('wrapped')} />
           <SidebarItem icon={<Settings size={18}/>} label="System Settings" active={activeTab === 'settings'} onClick={() => setActiveTab('settings')} />
         </nav>
 
@@ -132,7 +225,7 @@ const Dashboard = () => {
               Sync Status: {isSyncing ? 'Active Scanning' : 'Ready'} // Last: {new Date(stats.lastSyncedAt).toLocaleTimeString()}
             </div>
             <h1 className="text-4xl font-[900] text-black tracking-tighter leading-none italic uppercase">
-              {activeTab === 'summary' ? 'Operational Feed.' : activeTab === 'repos' ? 'Repository Stats.' : 'System Settings.'}
+              {activeTab === 'summary' ? 'Operational Feed.' : activeTab === 'repos' ? 'Repository Stats.' : activeTab === 'wrapped' ? 'Wrapped Signal.' : 'System Settings.'}
             </h1>
           </div>
           {activeTab === 'summary' && (
@@ -257,6 +350,11 @@ const Dashboard = () => {
                         <div className="text-4xl glitch-text" style={{color: getVibeColor(m.avgSentiment)}}>{m.topMood}</div>
                       </div>
                       
+                      <div className="p-5 bg-white text-black border-[4px] border-black shadow-[6px_6px_0px_#000] rotate-[-1deg]">
+                        <div className="text-[10px] font-black uppercase text-[#FF6B00] mb-2">Executive Directive:</div>
+                        <div className="text-sm font-[900] italic leading-tight uppercase underline decoration-black/40 decoration-2">{m.executiveDirective}</div>
+                      </div>
+
                       <div className="p-3 bg-white text-black border-[2px] border-black font-bold text-[10px]">
                         SYSTEM STATUS: <span className="text-[#FF6B00]">SYNCED</span><br/>
                         RESONANCE: <span className="underline">{m.emotionalResonance}</span>
@@ -331,6 +429,126 @@ const Dashboard = () => {
           </div>
         )}
 
+        {activeTab === 'wrapped' && (
+          <div className="flex flex-col items-center justify-center p-4 min-h-[80vh] animate-in zoom-in duration-500">
+             <div ref={posterRef} className="relative max-w-md w-full aspect-[3/4] bg-black border-[12px] border-black shadow-[20px_20px_0px_white] p-8 flex flex-col justify-between overflow-hidden group">
+                <div className="absolute inset-0 opacity-10 pointer-events-none" 
+                     style={{ backgroundImage: 'radial-gradient(#FF6B00 2px, transparent 2px)', backgroundSize: '24px 24px' }}></div>
+                
+                {/* Header */}
+                <div className="relative z-10 flex justify-between items-start">
+                   <div>
+                      <div className="bg-[#FF6B00] text-white px-3 py-1 text-[10px] font-[900] uppercase italic border-2 border-black inline-block mb-2">Signal: 2026.03</div>
+                      <h2 className="text-7xl font-[1000] text-white leading-[0.75] tracking-tighter uppercase italic">DEVPULSE<br/><span className="text-[#FFD600]">WRAPPED.</span></h2>
+                   </div>
+                   <Zap className="text-[#FFD600] fill-[#FFD600] w-12 h-12" strokeWidth={3} />
+                </div>
+
+                {/* Body Metrics */}
+                <div className="relative z-10 space-y-6">
+                   <div className="space-y-1">
+                      <div className="text-[10px] font-black text-[#FF6B00] uppercase tracking-widest italic">Primary Command Mood</div>
+                      <div className="text-6xl font-[1000] text-white uppercase italic tracking-tighter glitch-text" style={{color: getVibeColor(m.avgSentiment)}}>{m.topMood}</div>
+                   </div>
+
+                   <div className="grid grid-cols-2 gap-4">
+                      <WrappedStat label="Active Signals" value={m.totalCommits} unit="Ingested" />
+                      <WrappedStat label="Avg Vibe" value={`${m.avgSentiment}%`} unit="Positive" />
+                      <WrappedStat label="Burnout Risk" value={`${m.avgBurnout}%`} unit="Danger" />
+                      <WrappedStat label="Cognitive" value={m.cognitiveLoad} unit="Normalized" />
+                   </div>
+                </div>
+
+                {/* Footer Insight */}
+                <div className="relative z-10 p-6 bg-[#FFD600] border-[6px] border-black rotate-[-2deg] shadow-[8px_8px_0px_#FF6B00]">
+                   <div className="text-[10px] font-black text-black/40 uppercase tracking-widest mb-1 italic">Directive from Central Intelligence:</div>
+                   <div className="text-lg font-[1000] text-black uppercase italic leading-tight leading-none tracking-tighter">{m.executiveDirective}</div>
+                </div>
+
+                <div className="absolute bottom-4 left-8 text-white/20 text-[60px] font-[1000] italic uppercase select-none pointer-events-none -z-0">ALL SIGNAL</div>
+             </div>
+             
+             <div className="mt-10 flex flex-col md:flex-row gap-4">
+                <button 
+                  onClick={downloadPoster}
+                  className="bg-black text-white px-8 py-4 border-4 border-black font-black uppercase italic hover:bg-white hover:text-black transition-all flex items-center gap-2 shadow-[8px_8px_0px_#FFD600]"
+                >
+                  <Download size={20} /> Export Signal Poster
+                </button>
+                <button 
+                  onClick={downloadReport}
+                  className="bg-[#FF6B00] text-white px-8 py-4 border-4 border-black font-black uppercase italic hover:bg-black transition-all flex items-center gap-2 shadow-[8px_8px_0px_black]"
+                >
+                  <BarChart size={20} /> Compile Intelligence Report
+                </button>
+             </div>
+
+             {/* Hidden Intelligence Report Matrix (Pre-render for capture) */}
+             <div className="fixed overflow-hidden h-1 w-1 opacity-0 pointer-events-none">
+                <div ref={reportRef} className="w-[1200px] bg-white p-20 flex flex-col gap-10 font-['Outfit']">
+                   <div className="flex justify-between items-end border-b-[20px] border-black pb-10">
+                      <div>
+                         <h1 className="text-9xl font-[1000] tracking-tighter italic uppercase leading-none">INTEL_REPORT</h1>
+                         <div className="text-3xl font-black uppercase tracking-[0.2em] text-[#FF6B00]">OPERATIONAL_SUMMARY_MATRIX</div>
+                      </div>
+                      <div className="text-right">
+                         <div className="text-xl font-bold uppercase opacity-40">System: DEVPULSE_OS_v1.0</div>
+                         <div className="text-xl font-bold uppercase opacity-40">Extraction: {new Date().toLocaleDateString()}</div>
+                      </div>
+                   </div>
+
+                   <div className="grid grid-cols-3 gap-10">
+                      <div className="bg-black text-white p-10 border-[10px] border-black">
+                         <div className="text-xl font-black uppercase tracking-widest text-[#FF6B00] mb-4 italic">Command Stability</div>
+                         <div className="text-8xl font-[1000] italic leading-none mb-4">{m.signalStability}</div>
+                         <p className="text-sm font-bold opacity-60 uppercase">System indicates consistent output cycles with minimal friction drift.</p>
+                      </div>
+                      <div className="bg-[#FFD600] text-black p-10 border-[10px] border-black">
+                         <div className="text-xl font-black uppercase tracking-widest mb-4 italic">Cognitive Intensity</div>
+                         <div className="text-8xl font-[1000] italic leading-none mb-4">{m.cognitiveLoad}</div>
+                         <p className="text-sm font-bold opacity-60 uppercase">Load is currently within optimized safety parameters for deep-work cycles.</p>
+                      </div>
+                      <div className="bg-white text-black p-10 border-[10px] border-black">
+                         <div className="text-xl font-black uppercase tracking-widest text-[#FF6B00] mb-4 italic">Emotional Resonance</div>
+                         <div className="text-8xl font-[1000] italic leading-none mb-4">{m.emotionalResonance}</div>
+                         <p className="text-sm font-bold opacity-60 uppercase">Signal tone matches primary directive: {m.topMood}.</p>
+                      </div>
+                   </div>
+
+                   <div className="p-10 border-[10px] border-black bg-black text-white relative">
+                      <div className="absolute top-10 right-10 text-[#FF6B00] opacity-20"><Zap size={120} /></div>
+                      <div className="text-2xl font-[1000] text-[#FF6B00] uppercase italic tracking-[0.3em] mb-4">Executive Directive Matrix</div>
+                      <div className="text-5xl font-[1000] italic uppercase leading-snug underline decoration-[#FF6B00] decoration-8">{m.executiveDirective}</div>
+                   </div>
+
+                   <div className="grid grid-cols-4 gap-6">
+                      <div className="border-4 border-black p-6">
+                         <div className="text-xs font-black uppercase opacity-40 mb-2 italic">Total Signals</div>
+                         <div className="text-4xl font-black italic">{m.totalCommits}</div>
+                      </div>
+                      <div className="border-4 border-black p-6">
+                         <div className="text-xs font-black uppercase opacity-40 mb-2 italic">Burnout Bias</div>
+                         <div className="text-4xl font-black italic">{m.avgBurnout}%</div>
+                      </div>
+                      <div className="border-4 border-black p-6">
+                         <div className="text-xs font-black uppercase opacity-40 mb-2 italic">Peak Activity Matrix</div>
+                         <div className="text-4xl font-black italic uppercase">{m.peakDay}</div>
+                      </div>
+                      <div className="border-4 border-black p-6">
+                         <div className="text-xs font-black uppercase opacity-40 mb-2 italic">Session Precision</div>
+                         <div className="text-4xl font-black italic">{m.linguisticPrecision}</div>
+                      </div>
+                   </div>
+
+                   <div className="mt-10 pt-10 border-t-[10px] border-black flex justify-between font-black italic text-xl">
+                      <div>© 2026 DEVPULSE_PLATFORM_INTELLIGENCE // ZERO_FLUFF</div>
+                      <div className="text-[#FF6B00]">AUTHENTICATED_SIGNAL_ENCODING: {Math.random().toString(36).substring(7).toUpperCase()}</div>
+                   </div>
+                </div>
+             </div>
+          </div>
+        )}
+
         {activeTab === 'settings' && (
           <div className="max-w-xl mx-auto space-y-10 animate-in fade-in duration-500">
             <div className="bg-white border-[6px] border-black p-8 shadow-[15px_15px_0px_0px_#000]">
@@ -374,7 +592,7 @@ const Dashboard = () => {
                  <div className="pt-6 border-t-4 border-black space-y-4">
                     <button 
                       onClick={() => {
-                        alert('CONFIG_SYNCED: Operational parameters updated.');
+                        notify('CONFIG_SYNCED: Operational parameters updated.', 'success');
                       }}
                       className="w-full bg-black text-[#FFD600] py-4 text-xl font-[900] uppercase italic border-4 border-black hover:bg-[#FF6B00] hover:text-white transition-all mb-4"
                     >
@@ -449,6 +667,14 @@ const HealthBar = ({ label, value, color, bg }) => (
         style={{ width: `${Math.max(0, Math.min(100, value))}%`, backgroundColor: color }}
       ></div>
     </div>
+  </div>
+);
+
+const WrappedStat = ({ label, value, unit }) => (
+  <div className="border-l-4 border-[#FF6B00] pl-3 py-1">
+    <div className="text-[9px] font-black text-white/40 uppercase tracking-widest italic">{label}</div>
+    <div className="text-2xl font-[1000] text-white italic tracking-tighter leading-none">{value}</div>
+    <div className="text-[8px] font-black text-[#FF6B00] uppercase italic mt-0.5">{unit}</div>
   </div>
 );
 
