@@ -71,11 +71,6 @@ app.get('/api/v1/health', (req, res) => {
   });
 });
 
-// Root route
-app.get('/', (req, res) => {
-  res.send('DevPulse API is running...');
-});
-
 // Serve static assets in production
 if (process.env.NODE_ENV === 'production') {
   const distPath = path.join(__dirname, '../client/dist');
@@ -86,6 +81,11 @@ if (process.env.NODE_ENV === 'production') {
       return next();
     }
     res.sendFile(path.join(distPath, 'index.html'));
+  });
+} else {
+  // Optional: Add a root route for development to confirm API is running
+  app.get('/', (req, res) => {
+    res.send('DevPulse API is running (Development Mode)...');
   });
 }
 
