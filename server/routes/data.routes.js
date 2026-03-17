@@ -40,15 +40,20 @@ router.get('/stats', protect, catchAsync(async (req, res) => {
     syncAllForUser(req.user).catch(() => {});
   }
 
-  // Advanced Aggregation for reflective stats
+  // Fetch global count for simple metrics
+  const globalCount = await Commit.countDocuments({ userId });
+
+  // Advanced Aggregation for RELEVANT stats (Last 100 Signals)
   const advancedStats = await Commit.aggregate([
     { $match: { userId } },
+    { $sort: { timestamp: -1 } },
+    { $limit: 100 },
     {
       $group: {
         _id: null,
         avgSentiment: { $avg: "$sentimentScore" },
         avgBurnout: { $avg: "$burnoutIndex" },
-        totalCommits: { $count: {} },
+        sampleSize: { $count: {} },
         avgAdditions: { $avg: "$additions" },
         avgDeletions: { $avg: "$deletions" },
         avgFilesChanged: { $avg: "$filesChanged" },
@@ -62,7 +67,7 @@ router.get('/stats', protect, catchAsync(async (req, res) => {
   const stats = advancedStats[0] || { 
     avgSentiment: 50, 
     avgBurnout: 0, 
-    totalCommits: 0, 
+    sampleSize: 0, 
     avgAdditions: 0, 
     avgDeletions: 0, 
     avgFilesChanged: 0, 
@@ -71,9 +76,9 @@ router.get('/stats', protect, catchAsync(async (req, res) => {
     messages: []
   };
 
-  // Calculate Linguistic Precision (avg word count)
+  // Calculate Linguistic Precision (avg word count) - Recent Relevancy
   const totalWords = stats.messages.reduce((acc, msg) => acc + (msg?.split(/\s+/)?.length || 0), 0);
-  const linguisticPrecision = stats.totalCommits > 0 ? Math.round(totalWords / stats.totalCommits) : 0;
+  const linguisticPrecision = stats.sampleSize > 0 ? Math.round(totalWords / stats.sampleSize) : 0;
 
   // Calculate Cognitive Load Score (0-100 normalized)
   // Higher additions/deletions and files changed = higher load
@@ -169,15 +174,15 @@ router.get('/stats', protect, catchAsync(async (req, res) => {
     .limit(5)
     .populate('repoId', 'name');
 
-  // 5. Generate Aggregated Directive (True AI Wellness Directive)
-  const statsSummary = `Total Commits: ${stats.totalCommits}, Avg Sentiment: ${stats.avgSentiment}%, Avg Burnout: ${stats.avgBurnout}%, Cognitive Load: ${cognitiveLoad}%, Recent Messages: ${stats.messages.slice(0, 10).join('; ')}`;
+  // 5. Generate Aggregated Directive (Recent Signal Focus)
+  const statsSummary = `RECENT_RELEVANCY_MATRIX: Sample_Size: ${stats.sampleSize}, Avg_Sentiment: ${stats.avgSentiment}%, Avg_Burnout: ${stats.avgBurnout}%, Cognitive_Load: ${cognitiveLoad}%, Latest_Messages: ${stats.messages.slice(0, 5).join('; ')}`;
   const executiveDirective = await generateExecutiveDirective(statsSummary);
 
   res.status(200).json({
     success: true,
     data: {
       metrics: {
-        totalCommits: stats.totalCommits || 0,
+        totalCommits: globalCount || 0,
         repoCount: repoCount || 0,
         emotionalResonance: `${resonance}%`,
         avgSentiment: Math.round(stats.avgSentiment) || 0,

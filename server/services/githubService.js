@@ -30,6 +30,7 @@ export const syncUserRepos = async (user) => {
   const { data: repos } = await octokit.rest.repos.listForAuthenticatedUser({
     visibility: 'all',
     per_page: 100,
+    sort: 'pushed'
   });
 
   const syncedRepos = [];
@@ -61,24 +62,28 @@ export const syncUserRepos = async (user) => {
  */
 export const syncRepoCommits = async (user, repo) => {
   const octokit = getOctokit(user.githubAccessToken);
-  const ninetyDaysAgo = new Date(Date.now() - 90 * 24 * 60 * 60 * 1000);
+  // Default lookback reduced to 30 days for faster relevance
+  const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
   
   const [owner, repoName] = repo.fullName.split('/');
 
-  // Paginate all commits from last 90 days
+  // Paginate commits from last 30 days
   const commits = await octokit.paginate(
     octokit.rest.repos.listCommits,
     {
       owner,
       repo: repoName,
-      since: ninetyDaysAgo.toISOString(),
+      since: thirtyDaysAgo.toISOString(),
       per_page: 100,
     }
   );
 
+  // Focus only on the most recent 40 signals per repo for maximum dashboard speed
+  const priorityCommits = commits.slice(0, 40);
+
   const newCommits = [];
 
-  for (const commitData of commits) {
+  for (const commitData of priorityCommits) {
     // Optimization: Check if commit already fully analyzed with telemetry
     const existingCommit = await Commit.findOne({ sha: commitData.sha });
     
@@ -172,9 +177,15 @@ export const syncAllForUser = async (userInput) => {
     // 2. Fetch and sync repos
     const repos = await syncUserRepos(user);
 
-    // 3. Sync commits for each repo sequentially to respect system limits
-    for (const repo of repos) {
-      await syncRepoCommits(user, repo);
+    // 3. Sync commits for each repo with controlled concurrency
+    // We use a simple chunking to process 3 repos at a time to avoid GH secondary limits
+    const repoChunks = [];
+    for (let i = 0; i < repos.length; i += 3) {
+      repoChunks.push(repos.slice(i, i + 3));
+    }
+
+    for (const chunk of repoChunks) {
+      await Promise.all(chunk.map(repo => syncRepoCommits(user, repo)));
     }
 
     // 4. Update user sync status and lastSyncedAt
